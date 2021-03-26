@@ -2,6 +2,7 @@ const { Sequelize, Model, DataTypes } = require("sequelize");
 const Conversation = require("./Conversation");
 const Message = require("./Message");
 const Friend = require("./Friend");
+const User_Conversation = require("./User_Conversation");
 
 const sequelize = new Sequelize(
   `mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
@@ -37,10 +38,25 @@ User.init(
   { sequelize, modelName: "User", tableName: "users" }
 );
 
+User.belongsToMany(Conversation, {
+  through: User_Conversation,
+  sourceKey: "id",
+  foreignKey: "user_id",
+  otherKey: "id",
+});
+Conversation.belongsToMany(User, {
+  through: User_Conversation,
+  sourceKey: "id",
+  foreignKey: "conversation_id",
+  otherKey: "id",
+});
 User.hasMany(Message, { foreignKey: "user_id" });
-Message.belongsTo(User, { foreignKey: "id" });
+Message.belongsTo(User, { foreignKey: "user_id" });
 
 User.hasMany(Friend, { foreignKey: "user_a" });
-Friend.belongsTo(User, { foreignKey: "user_b", targetKey: "id" });
+Friend.belongsTo(User, { foreignKey: "user_a", targetKey: "id" });
+
+Conversation.hasMany(Message, { foreignKey: "conversation_id" });
+Message.belongsTo(Conversation, { foreignKey: "conversation_id" });
 
 module.exports = User;

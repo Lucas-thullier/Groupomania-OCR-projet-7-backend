@@ -4,34 +4,36 @@ const sequelize = new Sequelize(
   `mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
 );
 
-const Conversation = sequelize.define(
-  "Conversation",
+class Conversation extends Model {
+  static getConvId(userId, friendId) {
+    console.log(Conversation);
+    User.findOne({
+      where: {
+        id: 1,
+      },
+    }).then((user) => {
+      console.log(user);
+      user.addConversation();
+      // conversation.getUsers().then((response) => console.log(response));
+    });
+    // return this.findOne({
+    //   where: {
+    //     user_id_a: userId,
+    //     user_,
+    //   },
+    // });
+  }
+}
+
+Conversation.init(
   {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       primaryKey: true,
     },
-    user_id_a: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
-    },
-    user_id_b: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
-    },
   },
-  { tableName: "conversations" }
+  { sequelize, modelName: "Conversation", tableName: "conversations" }
 );
-
-// Conversation.belongsTo(User);
 
 module.exports = Conversation;

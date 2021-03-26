@@ -1,11 +1,9 @@
+const { Op } = require("sequelize");
 const User = require("../Models/User");
 const bcrypt = require("bcrypt");
 const jsonWebToken = require("jsonwebtoken");
 const validator = require("validator");
-
 const Conversation = require("../Models/Conversation");
-const Message = require("../Models/Message");
-const Friend = require("../Models/Friend");
 
 exports.signup = (req, res, next) => {
   if (!validator.isStrongPassword(req.body.password)) {
@@ -32,7 +30,11 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email })
+  User.findOne({
+    where: {
+      email: req.body.email,
+    },
+  })
     .then((user) => {
       if (!user) {
         return res.statut(401).json({ error: "Utilisateur non trouvé !" });
@@ -44,15 +46,33 @@ exports.login = (req, res, next) => {
             return res.statut(401).json({ error: "Mot de passe incorrect !" });
           }
           res.status(200).json({
-            userId: user._id,
-            token: jsonWebToken.sign(
-              { userId: user._id },
-              "RANDOM_TOKEN_SECRET",
-              { expiresIn: "24h" }
-            ),
+            userId: user.id,
+            token: jsonWebToken.sign({ userId: user.id }, "RANDOM_TOKEN_SECRET", {
+              expiresIn: "24h",
+            }),
           });
         })
         .catch((error) => res.status(500).json({ error }));
     })
     .catch((error) => res.status(500).json({ error }));
+};
+
+exports.searchUser = (req, res, next) => {
+  const searchContent = req.query.searchContent;
+  User.findAll({
+    where: {
+      username: {
+        [Op.like]: `%${searchContent}%`,
+      },
+    },
+    attributes: {
+      exclude: ["password"],
+    },
+  })
+    .then((userLikeSearch) => {
+      res.send(userLikeSearch);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };

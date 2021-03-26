@@ -6,31 +6,15 @@ const sequelize = new Sequelize(
   `mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
 );
 
-class Message extends Model {
-  static getConversationFor(id) {
-    return this.findAll({
-      where: {
-        conversation_id: id,
-      },
-      attributes: ["id", "text_content", "send_at"],
-      include: "User",
-    });
-  }
+class User_Conversation extends Model {}
 
-  static createNewMessage() {}
-}
-
-Message.init(
+User_Conversation.init(
   {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       autoIncrement: true,
-    },
-    text_content: {
-      type: DataTypes.STRING(2000),
-      allowNull: false,
     },
     user_id: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -39,10 +23,6 @@ Message.init(
         model: User,
         key: "id",
       },
-    },
-    send_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
     },
     conversation_id: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -53,7 +33,7 @@ Message.init(
       },
     },
   },
-  { sequelize, modelName: "Message", tableName: "messages" }
+  { sequelize, modelName: "User_Conversation", tableName: "user_conversation" }
 );
 
-module.exports = Message;
+module.exports = User_Conversation;
