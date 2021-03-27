@@ -42,19 +42,28 @@ User.belongsToMany(Conversation, {
   through: User_Conversation,
   sourceKey: "id",
   foreignKey: "user_id",
-  otherKey: "id",
+  // otherKey: "id",
 });
 Conversation.belongsToMany(User, {
   through: User_Conversation,
   sourceKey: "id",
   foreignKey: "conversation_id",
-  otherKey: "id",
+  // otherKey: "id",
 });
+
+User.belongsToMany(User, {
+  through: Friend,
+  as: "friend",
+  sourceKey: "id",
+  foreignKey: "user_a",
+  otherKey: "user_b",
+});
+
+// User.hasMany(User, { foreignKey: "user_a" });
+// Friend.belongsTo(User, { foreignKey: "user_a", targetKey: "id" });
+
 User.hasMany(Message, { foreignKey: "user_id" });
 Message.belongsTo(User, { foreignKey: "user_id" });
-
-User.hasMany(Friend, { foreignKey: "user_a" });
-Friend.belongsTo(User, { foreignKey: "user_a", targetKey: "id" });
 
 Conversation.hasMany(Message, { foreignKey: "conversation_id" });
 Message.belongsTo(Conversation, { foreignKey: "conversation_id" });

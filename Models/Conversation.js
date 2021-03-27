@@ -12,16 +12,8 @@ class Conversation extends Model {
         id: 1,
       },
     }).then((user) => {
-      console.log(user);
       user.addConversation();
-      // conversation.getUsers().then((response) => console.log(response));
     });
-    // return this.findOne({
-    //   where: {
-    //     user_id_a: userId,
-    //     user_,
-    //   },
-    // });
   }
 }
 
@@ -31,6 +23,7 @@ Conversation.init(
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       primaryKey: true,
+      autoIncrement: true,
     },
   },
   { sequelize, modelName: "Conversation", tableName: "conversations" }

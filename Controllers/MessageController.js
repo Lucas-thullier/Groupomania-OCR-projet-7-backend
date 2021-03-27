@@ -7,9 +7,7 @@ exports.postMessage = (req, res, next) => {
   const messageContent = req.body.messageContent;
   const convId = req.body.convId;
   const userId = req.body.userId;
-  console.log(req.body);
-  const newMessage = Message.create({
-    // TODO besoin d'auto incremeent id
+  Message.create({
     text_content: messageContent,
     user_id: parseInt(userId),
     conversation_id: convId,

@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const Conversation = require("../Models/Conversation");
 const User = require("../Models/User");
 const Message = require("../Models/Message");
+const User_Conversation = require("../Models/User_Conversation");
 
 exports.getConversation = (req, res, next) => {
   Message.getConversationFor(req.query.convId).then((messageData) => {
@@ -39,14 +40,29 @@ exports.getAllConvByUserId = (req, res, next) => {
   });
 };
 
-// exports.getConversationByUserAndFriendId = (req, res, next) => {
-//   const userId = req.query.userId;
-//   const friendId = req.query.friendId;
+exports.createConversation = async (req, res, next) => {
+  const userId = req.body.userId;
+  const friendId = req.body.friendId;
+  const isAlreadyConversation = await User_Conversation.count({
+    where: {
+      id: {
+        [Op.or]: [userId, friendId],
+      },
+    },
+  });
+  if (!isAlreadyConversation) {
+    const conversation = await Conversation.create();
 
-//   Conversation.getConvId(userId, friendId).then((convData) => {
-//     const convId = convData.dataValues.id;
-//     Message.getConversationFor(convId).then((messagesData) => {
-//       messagesData = { convId: convId, messagesData: messagesData };
-//       res.send(messagesData);
-//     });
-//   });
+    await User_Conversation.create({
+      user_id: userId,
+      conversation_id: conversation.getDataValue("id"),
+    });
+    await User_Conversation.create({
+      user_id: friendId,
+      conversation_id: conversation.getDataValue("id"),
+    });
+    res.send(true);
+  } else {
+    res.send(false);
+  }
+};

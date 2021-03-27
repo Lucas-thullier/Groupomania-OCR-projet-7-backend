@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jsonWebToken = require("jsonwebtoken");
 const validator = require("validator");
 const Conversation = require("../Models/Conversation");
+const Friend = require("../Models/Friend");
 
 exports.signup = (req, res, next) => {
   if (!validator.isStrongPassword(req.body.password)) {
@@ -18,7 +19,7 @@ exports.signup = (req, res, next) => {
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
-      const newUser = User.create({
+      User.create({
         username: req.body.username,
         email: req.body.email,
         password: hash,
@@ -71,6 +72,65 @@ exports.searchUser = (req, res, next) => {
   })
     .then((userLikeSearch) => {
       res.send(userLikeSearch);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+exports.userById = (req, res, next) => {
+  const userId = req.query.userId;
+  User.findOne({
+    where: {
+      id: userId,
+    },
+    exclude: ["password"],
+  })
+    .then((singleUser) => {
+      res.send(singleUser);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+exports.addFriend = (req, res, next) => {
+  const userId = req.body.userId;
+  const newFriendId = req.body.newFriendId;
+  Friend.create({
+    user_a: userId,
+    user_b: newFriendId,
+  });
+};
+exports.searchFriendUsers = (req, res, next) => {
+  const userId = req.query.userId;
+  const searchContent = req.query.searchContent;
+  console.log(searchContent);
+  User.findOne({
+    where: {
+      id: userId,
+    },
+    include: {
+      model: User,
+      as: "friend",
+      where: {
+        username: {
+          [Op.like]: `%${searchContent}%`,
+        },
+      },
+      attributes: {
+        exclude: ["password"],
+      },
+      through: {
+        attributes: [],
+      },
+    },
+    attributes: {
+      exclude: ["password"],
+    },
+  })
+    .then((result) => {
+      res.send(result.getDataValue("friend"));
     })
     .catch((error) => {
       console.log(error);

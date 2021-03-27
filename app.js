@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const fs = require("fs");
+const auth = require("./middleware/auth");
 
 const app = express();
 
@@ -10,6 +11,7 @@ const FeedPostRoute = require("./Routes/FeedPostRoute");
 const ConversationRoute = require("./Routes/ConversationRoute");
 const FriendsRoute = require("./Routes/FriendsRoute");
 const MessageRoute = require("./Routes/MessageRoute");
+const AuthCheckRoute = require("./Routes/AuthCheckRoute");
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -27,5 +29,6 @@ app.use("/user", UserRoute);
 app.use("/conversation", ConversationRoute);
 app.use("/friends", FriendsRoute);
 app.use("/messages", MessageRoute);
+app.use("/checkIfLogged", AuthCheckRoute);
 
 module.exports = app;

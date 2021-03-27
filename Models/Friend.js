@@ -22,6 +22,7 @@ Friend.init(
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
+      autoIncrement: true,
       primaryKey: true,
     },
     user_a: {
