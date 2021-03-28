@@ -3,7 +3,7 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 
 router.get("/", auth, (req, res, next) => {
-  res.send("ok");
+  res.status(200).send();
 });
 
 module.exports = router;

@@ -3,6 +3,7 @@ const Conversation = require("../Models/Conversation");
 const User = require("../Models/User");
 const Message = require("../Models/Message");
 const User_Conversation = require("../Models/User_Conversation");
+const Helper = require("../libs/Helper");
 
 exports.getConversation = (req, res, next) => {
   Message.getConversationFor(req.query.convId).then((messageData) => {
@@ -11,7 +12,8 @@ exports.getConversation = (req, res, next) => {
 };
 
 exports.getAllConvByUserId = (req, res, next) => {
-  const userId = req.query.userId;
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
   User.findOne({
     where: {
       id: userId,
@@ -41,7 +43,8 @@ exports.getAllConvByUserId = (req, res, next) => {
 };
 
 exports.createConversation = async (req, res, next) => {
-  const userId = req.body.userId;
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
   const friendId = req.body.friendId;
   const isAlreadyConversation = await User_Conversation.count({
     where: {

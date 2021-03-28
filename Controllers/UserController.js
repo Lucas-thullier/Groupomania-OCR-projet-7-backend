@@ -5,6 +5,7 @@ const jsonWebToken = require("jsonwebtoken");
 const validator = require("validator");
 const Conversation = require("../Models/Conversation");
 const Friend = require("../Models/Friend");
+const Helper = require("../libs/Helper");
 
 exports.signup = (req, res, next) => {
   if (!validator.isStrongPassword(req.body.password)) {
@@ -79,10 +80,11 @@ exports.searchUser = (req, res, next) => {
 };
 
 exports.userById = (req, res, next) => {
-  const userId = req.query.userId;
+  const authToken = req.headers.authorization;
+  const searchedUserId = req.query.userId;
   User.findOne({
     where: {
-      id: userId,
+      id: searchedUserId,
     },
     exclude: ["password"],
   })
@@ -95,17 +97,26 @@ exports.userById = (req, res, next) => {
 };
 
 exports.addFriend = (req, res, next) => {
-  const userId = req.body.userId;
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
   const newFriendId = req.body.newFriendId;
-  Friend.create({
-    user_a: userId,
-    user_b: newFriendId,
-  });
+  if (userId == newFriendId) {
+    res.send("refuse car ami = user connecte");
+  } else {
+    Friend.create({
+      user_a: userId,
+      user_b: newFriendId,
+    })
+      .then(() => {
+        res.send("ok");
+      })
+      .catch((error) => console.log(error));
+  }
 };
 exports.searchFriendUsers = (req, res, next) => {
-  const userId = req.query.userId;
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
   const searchContent = req.query.searchContent;
-  console.log(searchContent);
   User.findOne({
     where: {
       id: userId,
@@ -135,4 +146,54 @@ exports.searchFriendUsers = (req, res, next) => {
     .catch((error) => {
       console.log(error);
     });
+};
+
+exports.getFriendsByUserId = (req, res, next) => {
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
+
+  User.findOne({
+    where: {
+      id: userId,
+    },
+    attributes: {
+      exclude: ["password"],
+    },
+    include: {
+      model: User,
+      as: "friend",
+      attributes: {
+        exclude: ["password", "friend"],
+      },
+      through: {
+        attributes: [],
+      },
+    },
+  })
+    .then((userWithFriends) => {
+      const friends = userWithFriends.getDataValue("friend");
+      res.send(friends);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+exports.changeProfilPicture = (req, res, next) => {
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
+  User.update(
+    {
+      values: {
+        imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
+      },
+    },
+    {
+      where: {
+        id: userId,
+      },
+    }
+  ).then((updatedUser) => {
+    console.log(updatedUser);
+  });
 };

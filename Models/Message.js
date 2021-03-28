@@ -40,10 +40,7 @@ Message.init(
         key: "id",
       },
     },
-    send_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
+
     conversation_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,

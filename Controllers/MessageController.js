@@ -6,15 +6,15 @@ const Helper = require(`${process.cwd()}/libs/Helper`);
 exports.postMessage = (req, res, next) => {
   const messageContent = req.body.messageContent;
   const convId = req.body.convId;
-  const userId = req.body.userId;
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
   Message.create({
     text_content: messageContent,
-    user_id: parseInt(userId),
+    user_id: userId,
     conversation_id: convId,
-    send_at: Helper.getActualDate(),
   })
-    .then((tets) => {
-      console.log(tets);
+    .then((test) => {
+      console.log(test);
       res.status(201).json({ message: "true" });
     })
     .catch((error) => res.status(400).json({ error }));

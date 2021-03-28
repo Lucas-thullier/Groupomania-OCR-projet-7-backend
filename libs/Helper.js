@@ -1,9 +1,11 @@
+const jwt = require("jsonwebtoken");
+
 class Helper {
-  static getActualDate() {
-    // TODO naze
-    let date = new Date(Date.now());
-    date = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-    return date;
+  static getUserIdWithToken(authToken) {
+    const token = authToken;
+    const decodedToken = jwt.verify(token, "RANDOM_TOKEN_SECRET");
+    const userId = decodedToken.userId;
+    return userId;
   }
 }
 module.exports = Helper;
