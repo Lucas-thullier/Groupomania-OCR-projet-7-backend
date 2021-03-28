@@ -1,3 +1,4 @@
+const sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const Conversation = require("../Models/Conversation");
 const User = require("../Models/User");
@@ -46,28 +47,57 @@ exports.createConversation = async (req, res, next) => {
   const authToken = req.headers.authorization;
   const userId = Helper.getUserIdWithToken(authToken);
   const friendId = req.body.friendId;
-  const isAlreadyConversation = await User_Conversation.count({
+  // const isAlreadyConversation = await User_Conversation.count({
+  //   where: {
+  //     user_id: {
+  //       [Op.or]: [userId, friendId],
+  //     },
+  //   },
+  // });
+  const test = await User.findOne({
     where: {
-      id: {
-        [Op.or]: [userId, friendId],
+      id: userId,
+    },
+    attributes: ["id"],
+    include: {
+      model: Conversation,
+      attributes: ["id"],
+      through: {
+        attributes: [],
+      },
+      include: {
+        model: User,
+        attributes: ["id"],
+        through: {
+          attributes: [],
+        },
+        where: {
+          id: friendId,
+        },
+        attributes: ["id"],
+        through: {
+          attributes: [],
+        },
       },
     },
   });
-  if (!isAlreadyConversation) {
-    const conversation = await Conversation.create();
+  console.log(test.Conversations[0].getDataValue("Users"));
+  res.send("tg");
+  // if (!isAlreadyConversation) {
+  //   const conversation = await Conversation.create();
 
-    await User_Conversation.create({
-      user_id: userId,
-      conversation_id: conversation.getDataValue("id"),
-    });
-    await User_Conversation.create({
-      user_id: friendId,
-      conversation_id: conversation.getDataValue("id"),
-    });
-    res.send(true);
-  } else {
-    res.send(false);
-  }
+  //   await User_Conversation.create({
+  //     user_id: userId,
+  //     conversation_id: conversation.getDataValue("id"),
+  //   });
+  //   await User_Conversation.create({
+  //     user_id: friendId,
+  //     conversation_id: conversation.getDataValue("id"),
+  //   });
+  //   res.send(true);
+  // } else {
+  //   res.send(false);
+  // }
 };
 
 exports.changeConversationPicture = (req, res, next) => {
