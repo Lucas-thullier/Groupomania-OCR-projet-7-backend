@@ -2,10 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const fs = require("fs");
 const auth = require("./middleware/auth");
+const path = require("path");
 
 const app = express();
 
-/* On initialise les routes */
 const UserRoute = require("./Routes/UserRoute");
 const FeedPostRoute = require("./Routes/FeedPostRoute");
 const ConversationRoute = require("./Routes/ConversationRoute");
@@ -24,6 +24,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use("/user", UserRoute);
 app.use("/conversation", ConversationRoute);

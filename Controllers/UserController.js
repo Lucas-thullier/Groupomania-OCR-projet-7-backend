@@ -1,3 +1,4 @@
+const sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const User = require("../Models/User");
 const bcrypt = require("bcrypt");
@@ -103,14 +104,44 @@ exports.addFriend = (req, res, next) => {
   if (userId == newFriendId) {
     res.send("refuse car ami = user connecte");
   } else {
-    Friend.create({
-      user_a: userId,
-      user_b: newFriendId,
+    User.findOne({
+      where: {
+        id: userId,
+      },
+      include: {
+        model: User,
+        as: "friend",
+        attributes: [[sequelize.fn("GROUP_CONCAT", sequelize.col("friend.id")), "friendsIds"]],
+        through: {
+          attributes: [],
+        },
+      },
+      attributes: [],
     })
-      .then(() => {
-        res.send("ok");
+      .then((userWithAllId) => {
+        // le group_concat ci dessus renvoie un array avec un seul element contenant une chaine de caractere = a l'ensemble des ids des amis
+        let friendsIds = userWithAllId.getDataValue("friend")[0].getDataValue("friendsIds");
+        friendsIds = friendsIds.split(",");
+        if (!friendsIds.includes(newFriendId)) {
+          Friend.create({
+            user_a: userId,
+            user_b: newFriendId,
+          })
+            .then(() => {
+              res.send("Creation reussie");
+            })
+            .catch((error) => {
+              console.log("erreur au moment de la creation d'un nouvel ami");
+              console.log(error);
+            });
+        } else {
+          res.send("Incroyable ! Vous etes deja amis");
+        }
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log("erreur au moment de la recuperation de l'ensemble des amis de l'utilisateur");
+        console.log(error);
+      });
   }
 };
 exports.searchFriendUsers = (req, res, next) => {
@@ -141,7 +172,11 @@ exports.searchFriendUsers = (req, res, next) => {
     },
   })
     .then((result) => {
-      res.send(result.getDataValue("friend"));
+      if (result && result.getDataValue("friend")) {
+        res.send(result.getDataValue("friend"));
+      } else {
+        res.send("");
+      }
     })
     .catch((error) => {
       console.log(error);
@@ -182,18 +217,21 @@ exports.getFriendsByUserId = (req, res, next) => {
 exports.changeProfilPicture = (req, res, next) => {
   const authToken = req.headers.authorization;
   const userId = Helper.getUserIdWithToken(authToken);
+  console.log(req.file);
   User.update(
     {
-      values: {
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
-      },
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
     },
     {
       where: {
         id: userId,
       },
     }
-  ).then((updatedUser) => {
-    console.log(updatedUser);
-  });
+  )
+    .then((updatedUser) => {
+      res.send("update effectue");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };

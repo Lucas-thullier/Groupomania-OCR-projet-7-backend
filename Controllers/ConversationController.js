@@ -69,3 +69,23 @@ exports.createConversation = async (req, res, next) => {
     res.send(false);
   }
 };
+
+exports.changeConversationPicture = (req, res, next) => {
+  const convId = req.body.convId;
+  Conversation.update(
+    {
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
+    },
+    {
+      where: {
+        id: convId,
+      },
+    }
+  )
+    .then((updatedUser) => {
+      res.send("update effectue");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};

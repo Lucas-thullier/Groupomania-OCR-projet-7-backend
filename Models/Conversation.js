@@ -25,6 +25,10 @@ Conversation.init(
       primaryKey: true,
       autoIncrement: true,
     },
+    imageUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   { sequelize, modelName: "Conversation", tableName: "conversations" }
 );
