@@ -12,6 +12,7 @@ const ConversationRoute = require("./Routes/ConversationRoute");
 const FriendsRoute = require("./Routes/FriendsRoute");
 const MessageRoute = require("./Routes/MessageRoute");
 const AuthCheckRoute = require("./Routes/AuthCheckRoute");
+const RedditRoute = require("./Routes/RedditRoute");
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -31,5 +32,6 @@ app.use("/conversation", ConversationRoute);
 app.use("/friends", FriendsRoute);
 app.use("/messages", MessageRoute);
 app.use("/checkIfLogged", AuthCheckRoute);
+app.use("/reddit", RedditRoute);
 
 module.exports = app;

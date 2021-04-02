@@ -4,6 +4,7 @@ const auth = require("../middleware/auth");
 const multer = require("../middleware/multer-config");
 const ConversationController = require("../Controllers/ConversationController");
 
+router.get("/getConversationById", auth, ConversationController.getConversationById);
 router.get("/getAllConvByUserId", auth, ConversationController.getAllConvByUserId);
 router.post("/createConversation", auth, ConversationController.createConversation);
 router.post(

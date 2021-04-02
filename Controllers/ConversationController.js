@@ -6,10 +6,25 @@ const Message = require("../Models/Message");
 const User_Conversation = require("../Models/User_Conversation");
 const Helper = require("../libs/Helper");
 
-exports.getConversation = (req, res, next) => {
-  Message.getConversationFor(req.query.convId).then((messageData) => {
-    return res.send(messageData);
-  });
+exports.getConversationById = (req, res, next) => {
+  Conversation.findOne({
+    where: {
+      id: req.query.id,
+    },
+    include: {
+      model: User,
+      attributes: ["name"],
+      through: {
+        attributes: [],
+      },
+    },
+  })
+    .then((conversation) => {
+      res.send(conversation);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
 
 exports.getAllConvByUserId = (req, res, next) => {
@@ -47,14 +62,7 @@ exports.createConversation = async (req, res, next) => {
   const authToken = req.headers.authorization;
   const userId = Helper.getUserIdWithToken(authToken);
   const friendId = req.body.friendId;
-  // const isAlreadyConversation = await User_Conversation.count({
-  //   where: {
-  //     user_id: {
-  //       [Op.or]: [userId, friendId],
-  //     },
-  //   },
-  // });
-  const test = await User.findOne({
+  const UserWithConversationsAndFriends = await User.findOne({
     where: {
       id: userId,
     },
@@ -71,33 +79,46 @@ exports.createConversation = async (req, res, next) => {
         through: {
           attributes: [],
         },
-        where: {
-          id: friendId,
-        },
-        attributes: ["id"],
-        through: {
-          attributes: [],
-        },
       },
     },
   });
-  console.log(test.Conversations[0].getDataValue("Users"));
-  res.send("tg");
-  // if (!isAlreadyConversation) {
-  //   const conversation = await Conversation.create();
 
-  //   await User_Conversation.create({
-  //     user_id: userId,
-  //     conversation_id: conversation.getDataValue("id"),
-  //   });
-  //   await User_Conversation.create({
-  //     user_id: friendId,
-  //     conversation_id: conversation.getDataValue("id"),
-  //   });
-  //   res.send(true);
-  // } else {
-  //   res.send(false);
-  // }
+  const conversationsWithUserId = UserWithConversationsAndFriends.Conversations;
+  if (isConversationExist(conversationsWithUserId) == false) {
+    const conversation = await Conversation.create();
+
+    await User_Conversation.create({
+      user_id: userId,
+      conversation_id: conversation.getDataValue("id"),
+    });
+    await User_Conversation.create({
+      user_id: friendId,
+      conversation_id: conversation.getDataValue("id"),
+    });
+    res.send(true);
+  } else {
+    res.send("c'est mort");
+  }
+
+  function isConversationExist(conversationsWithUserId) {
+    let countOfConvWithFriend = 0;
+    for (const singleConversation of conversationsWithUserId) {
+      if (singleConversation.getDataValue("Users").length == 2) {
+        const idUserA = singleConversation.getDataValue("Users")[0].getDataValue("id");
+        const idUserB = singleConversation.getDataValue("Users")[1].getDataValue("id");
+        if (friendId == idUserA) {
+          countOfConvWithFriend++;
+        }
+        if (friendId == idUserB) {
+          countOfConvWithFriend++;
+        }
+      }
+      if (countOfConvWithFriend >= 1) {
+        return true;
+      }
+    }
+    return false;
+  }
 };
 
 exports.changeConversationPicture = (req, res, next) => {
