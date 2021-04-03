@@ -12,19 +12,20 @@ exports.getHotSubreddits = (req, res, next) => {
 
   redditWrapper.getHot().then((hotSubreddits) => {
     let hotSubredditsData = [];
-    console.log(hotSubreddits[4]);
     for (const singleSubreddit of hotSubreddits) {
-      hotSubredditsData.push({
-        title: singleSubreddit.title,
-        author: singleSubreddit.author.name,
-        submissionId: singleSubreddit.name,
-        imageUrl: singleSubreddit.url.includes("imgur")
-          ? `${singleSubreddit.url}.jpg`
-          : singleSubreddit.url,
-        thumbnail: singleSubreddit.thumbnail,
-        commentsCount: singleSubreddit.num_comments,
-        url: "https://reddit.com" + singleSubreddit.permalink,
-      });
+      if (singleSubreddit.over_18 == false) {
+        hotSubredditsData.push({
+          title: singleSubreddit.title,
+          author: singleSubreddit.author.name,
+          submissionId: singleSubreddit.name,
+          thumbnail: singleSubreddit.thumbnail,
+          commentsCount: singleSubreddit.num_comments,
+          url: "https://reddit.com" + singleSubreddit.permalink,
+          preview: singleSubreddit.preview,
+          subredditNamePrefixed: singleSubreddit.subreddit_name_prefixed,
+          textContent: singleSubreddit.selftext,
+        });
+      }
     }
     res.send(hotSubredditsData);
   });
@@ -38,13 +39,11 @@ exports.getCommentsById = (req, res, next) => {
     clientSecret: "nh_b3Je-K4tUXirYbbeBoAVk1vv9QQ",
     refreshToken: "839979606045-wBu-L7yz6EXs-Sk6vuEWEw-VKVhIlQ",
   });
-
   redditWrapper
     .getSubmission(submissionId)
     .expandReplies({ limit: 0, depth: 0 })
     .then((singleSubmission) => {
       let comments = [];
-      // console.log(singleSubmission.comments);
       for (const singleComment of singleSubmission.comments) {
         comments.push({
           author: singleComment.author.name,
@@ -52,7 +51,63 @@ exports.getCommentsById = (req, res, next) => {
         });
       }
       res.send(comments);
-      // res.send("cc");
+    });
+};
+
+exports.getPopularSubreddits = (req, res, next) => {
+  const redditWrapper = new snoowrap({
+    userAgent: "groupomania study project",
+    clientId: "EDnNl-BJsw5LQQ",
+    clientSecret: "nh_b3Je-K4tUXirYbbeBoAVk1vv9QQ",
+    refreshToken: "839979606045-wBu-L7yz6EXs-Sk6vuEWEw-VKVhIlQ",
+  });
+  redditWrapper
+    .getPopularSubreddits()
+    .then((popularSubreddits) => {
+      const dataToSend = [];
+      popularSubreddits.forEach((singleSubreddit) => {
+        if (singleSubreddit.over18 == false) {
+          dataToSend.push({
+            displayName: singleSubreddit.display_name,
+            displayNamePrefixed: singleSubreddit.display_name_prefixed,
+          });
+        }
+      });
+      res.send(dataToSend);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+exports.getSubreddit = (req, res, next) => {
+  const redditWrapper = new snoowrap({
+    userAgent: "groupomania study project",
+    clientId: "EDnNl-BJsw5LQQ",
+    clientSecret: "nh_b3Je-K4tUXirYbbeBoAVk1vv9QQ",
+    refreshToken: "839979606045-wBu-L7yz6EXs-Sk6vuEWEw-VKVhIlQ",
+  });
+  redditWrapper
+    .getTop(req.query.subredditId)
+    .then((subredditContent) => {
+      const subredditData = [];
+      subredditContent.forEach((singleSubmission) => {
+        subredditData.push({
+          title: singleSubmission.title,
+          author: singleSubmission.author.name,
+          submissionId: singleSubmission.name,
+          thumbnail: singleSubmission.thumbnail,
+          commentsCount: singleSubmission.num_comments,
+          url: "https://reddit.com" + singleSubmission.permalink,
+          preview: singleSubmission.preview,
+          subredditNamePrefixed: singleSubmission.subreddit_name_prefixed,
+          textContent: singleSubmission.selftext,
+        });
+      });
+      res.send(subredditData);
+    })
+    .catch((error) => {
+      console.log(error);
     });
 };
 

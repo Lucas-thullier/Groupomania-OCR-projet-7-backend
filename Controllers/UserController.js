@@ -10,10 +10,7 @@ const Helper = require("../libs/Helper");
 
 exports.signup = (req, res, next) => {
   if (!validator.isStrongPassword(req.body.password)) {
-    throw (
-      "Le mot de passe doit contenir: une lettre minuscule, une lettre majuscule, un chiffre, " +
-      "un caractère spécial et doit faire plus de 8 caractères."
-    );
+    throw "Le mot de passe doit contenir: une lettre minuscule, une lettre majuscule, un chiffre, " + "un caractère spécial et doit faire plus de 8 caractères.";
   }
   if (!validator.isEmail(req.body.email)) {
     throw "L'adresse mail renseignée n'est pas valide.";
@@ -62,6 +59,8 @@ exports.login = (req, res, next) => {
 
 exports.searchUser = (req, res, next) => {
   const searchContent = req.query.searchContent;
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
   User.findAll({
     where: {
       username: {
@@ -71,8 +70,29 @@ exports.searchUser = (req, res, next) => {
     attributes: {
       exclude: ["password"],
     },
+    include: {
+      model: User,
+      as: "friend",
+      attributes: {
+        exclude: ["password"],
+      },
+      through: {
+        attributes: [],
+      },
+    },
   })
     .then((userLikeSearch) => {
+      userLikeSearch.map((singleUser) => {
+        singleUser = singleUser.getDataValue("friend").map((singleFriend) => {
+          if (singleFriend.id == userId) {
+            singleUser.setDataValue("isAlreadyFriend", true);
+            singleUser.isAlreadyFriend = true;
+          }
+          return singleFriend;
+        });
+        return singleUser;
+      });
+      console.log(userLikeSearch);
       res.send(userLikeSearch);
     })
     .catch((error) => {

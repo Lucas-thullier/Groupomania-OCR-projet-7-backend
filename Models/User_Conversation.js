@@ -2,9 +2,7 @@ const { Sequelize, Model, DataTypes } = require("sequelize");
 const User = require("./User");
 const Conversation = require("./Conversation");
 
-const sequelize = new Sequelize(
-  `mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
-);
+const sequelize = new Sequelize(`mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
 
 class User_Conversation extends Model {}
 
@@ -31,6 +29,11 @@ User_Conversation.init(
         model: Conversation,
         key: "id",
       },
+    },
+    as_leave_conversation: {
+      type: DataTypes.TINYINT.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
     },
   },
   { sequelize, modelName: "User_Conversation", tableName: "user_conversation" }

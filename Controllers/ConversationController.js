@@ -1,5 +1,5 @@
 const sequelize = require("sequelize");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const Conversation = require("../Models/Conversation");
 const User = require("../Models/User");
 const Message = require("../Models/Message");
@@ -50,6 +50,13 @@ exports.getAllConvByUserId = (req, res, next) => {
             },
           },
         ],
+        through: {
+          model: User_Conversation,
+          attributes: [],
+          where: {
+            as_leave_conversation: 0,
+          },
+        },
       },
     ],
   }).then((userWithConv) => {
@@ -71,7 +78,7 @@ exports.createConversation = async (req, res, next) => {
       model: Conversation,
       attributes: ["id"],
       through: {
-        attributes: [],
+        attributes: ["id", "as_leave_conversation"],
       },
       include: {
         model: User,
@@ -82,9 +89,9 @@ exports.createConversation = async (req, res, next) => {
       },
     },
   });
-
+  let existantConversation = null;
   const conversationsWithUserId = UserWithConversationsAndFriends.Conversations;
-  if (isConversationExist(conversationsWithUserId) == false) {
+  if (!isConversationExist(conversationsWithUserId)) {
     const conversation = await Conversation.create();
 
     await User_Conversation.create({
@@ -97,7 +104,18 @@ exports.createConversation = async (req, res, next) => {
     });
     res.send(true);
   } else {
-    res.send("c'est mort");
+    if (existantConversation.getDataValue("User_Conversation").as_leave_conversation == 1) {
+      console.log(existantConversation.getDataValue("User_Conversation").id);
+      User_Conversation.update({ as_leave_conversation: 0 }, { where: { id: existantConversation.getDataValue("User_Conversation").id } })
+        .then(() => {
+          res.send("Conversation réouverte");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      res.send("c'est mort");
+    }
   }
 
   function isConversationExist(conversationsWithUserId) {
@@ -114,6 +132,7 @@ exports.createConversation = async (req, res, next) => {
         }
       }
       if (countOfConvWithFriend >= 1) {
+        existantConversation = singleConversation;
         return true;
       }
     }
@@ -138,5 +157,42 @@ exports.changeConversationPicture = (req, res, next) => {
     })
     .catch((error) => {
       console.log(error);
+    });
+};
+
+exports.leaveConversation = (req, res, next) => {
+  const conversationId = req.body.conversationId;
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
+  User_Conversation.update(
+    { as_leave_conversation: 1 },
+    {
+      where: {
+        [Op.and]: {
+          conversation_id: conversationId,
+          user_id: userId,
+        },
+      },
+    }
+  )
+    .then((response) => {
+      res.send("Conversation quittée");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+exports.addUserToConversation = (req, res, next) => {
+  console.log("cc");
+  const convId = 109;
+  const friendId = 3;
+  User_Conversation.create({ user_id: 3, conversation_id: convId })
+    .then(() => {
+      res.send("cc");
+    })
+    .catch((error) => {
+      console.log(error);
+      console.log("s");
     });
 };
