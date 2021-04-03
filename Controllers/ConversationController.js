@@ -13,7 +13,7 @@ exports.getConversationById = (req, res, next) => {
     },
     include: {
       model: User,
-      attributes: ["name"],
+      attributes: ["username"],
       through: {
         attributes: [],
       },
