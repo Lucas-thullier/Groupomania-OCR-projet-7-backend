@@ -41,6 +41,10 @@ Friend.init(
         key: "id",
       },
     },
+    is_pending: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+    },
   },
   { sequelize, modelName: "Friend", tableName: "friends" }
 );

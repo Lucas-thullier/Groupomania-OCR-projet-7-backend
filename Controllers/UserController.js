@@ -85,17 +85,36 @@ exports.searchUser = (req, res, next) => {
     },
   })
     .then((userLikeSearch) => {
-      userLikeSearch.map((singleUser) => {
-        singleUser = singleUser.getDataValue("friend").map((singleFriend) => {
+      for (const singleUser in userLikeSearch) {
+        for (const singleFriend of userLikeSearch) {
           if (singleFriend.id == userId) {
-            singleUser.setDataValue("isAlreadyFriend", true);
+            singleFriend.setDataValue("isAlreadyFriend", true);
             singleUser.isAlreadyFriend = true;
           }
-          return singleFriend;
-        });
-        return singleUser;
+        }
+      }
+      userLikeSearch.forEach((singleUser, key) => {
+        if (
+          singleUser.getDataValue("friend").some((singleFriend) => {
+            if (singleFriend.id == userId) {
+              return true;
+            }
+          })
+        ) {
+          singleUser.setDataValue("isAlreadyFriend", true);
+        }
       });
-      console.log(userLikeSearch);
+      // userLikeSearch.map((singleUser) => {
+      //   singleUser = singleUser.getDataValue("friend").map((singleFriend) => {
+      //     console.log(singleFriend.id, userId);
+      //     if (singleFriend.id == userId) {
+      //       singleUser.setDataValue("isAlreadyFriend", true);
+      //       singleUser.isAlreadyFriend = true;
+      //     }
+      //     return singleFriend;
+      //   });
+      //   return singleUser;
+      // });
       res.send(userLikeSearch);
     })
     .catch((error) => {
@@ -150,9 +169,21 @@ exports.addFriend = (req, res, next) => {
             Friend.create({
               user_a: userId,
               user_b: newFriendId,
+              is_pending: 0,
             })
               .then(() => {
-                res.send("Creation reussie");
+                Friend.create({
+                  user_a: newFriendId,
+                  user_b: userId,
+                  is_pending: 1,
+                })
+                  .then(() => {
+                    res.send("Creation reussie");
+                  })
+                  .catch((error) => {
+                    console.log("erreur au moment de la creation d'un nouvel ami cote ami");
+                    console.log(error);
+                  });
               })
               .catch((error) => {
                 console.log("erreur au moment de la creation d'un nouvel ami");
@@ -165,9 +196,21 @@ exports.addFriend = (req, res, next) => {
           Friend.create({
             user_a: userId,
             user_b: newFriendId,
+            is_pending: 0,
           })
             .then(() => {
-              res.send("Creation reussie");
+              Friend.create({
+                user_a: newFriendId,
+                user_b: userId,
+                is_pending: 1,
+              })
+                .then(() => {
+                  res.send("Creation reussie");
+                })
+                .catch((error) => {
+                  console.log("erreur au moment de la creation d'un nouvel ami cote ami");
+                  console.log(error);
+                });
             })
             .catch((error) => {
               console.log("erreur au moment de la creation d'un nouvel ami");
@@ -181,6 +224,7 @@ exports.addFriend = (req, res, next) => {
       });
   }
 };
+
 exports.searchFriendUsers = (req, res, next) => {
   const authToken = req.headers.authorization;
   const userId = Helper.getUserIdWithToken(authToken);
