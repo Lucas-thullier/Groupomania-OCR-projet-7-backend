@@ -14,7 +14,7 @@ RedditComment.init(
       autoIncrement: true,
     },
     submission_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     user_id: {

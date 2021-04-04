@@ -1,9 +1,12 @@
 require("dotenv");
+const { Op } = require("sequelize");
 const snoowrap = require("snoowrap");
 const RedditComment = require("../Models/RedditComment");
+const User = require("../Models/User");
 const Helper = require(`${process.cwd()}/libs/Helper`);
 
 exports.getHotSubreddits = (req, res, next) => {
+  // hot submissions not subreddits
   const redditWrapper = new snoowrap({
     userAgent: "groupomania study project",
     clientId: "EDnNl-BJsw5LQQ",
@@ -11,29 +14,38 @@ exports.getHotSubreddits = (req, res, next) => {
     refreshToken: "839979606045-wBu-L7yz6EXs-Sk6vuEWEw-VKVhIlQ",
   });
 
-  redditWrapper.getHot().then((hotSubreddits) => {
-    let hotSubredditsData = [];
-    for (const singleSubreddit of hotSubreddits) {
-      if (singleSubreddit.over_18 == false) {
-        hotSubredditsData.push({
-          title: singleSubreddit.title,
-          author: singleSubreddit.author.name,
-          submissionId: singleSubreddit.name,
-          thumbnail: singleSubreddit.thumbnail,
-          commentsCount: singleSubreddit.num_comments,
-          url: "https://reddit.com" + singleSubreddit.permalink,
-          preview: singleSubreddit.preview,
-          subredditNamePrefixed: singleSubreddit.subreddit_name_prefixed,
-          textContent: singleSubreddit.selftext,
-        });
+  redditWrapper
+    .getHot()
+    .then((hotSubreddits) => {
+      let hotSubredditsData = [];
+      for (const singleSubreddit of hotSubreddits) {
+        if (singleSubreddit.over_18 == false) {
+          hotSubredditsData.push({
+            title: singleSubreddit.title,
+            author: singleSubreddit.author.name,
+            submissionId: singleSubreddit.name,
+            thumbnail: singleSubreddit.thumbnail,
+            commentsCount: singleSubreddit.num_comments,
+            url: "https://reddit.com" + singleSubreddit.permalink,
+            preview: singleSubreddit.preview,
+            subredditNamePrefixed: singleSubreddit.subreddit_name_prefixed,
+            textContent: singleSubreddit.selftext,
+          });
+        }
       }
-    }
-    res.send(hotSubredditsData);
-  });
+      res.send(hotSubredditsData);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
 
 exports.getCommentsById = (req, res, next) => {
   const submissionId = req.query.submissionId;
+  const redditAndGroupoComments = {
+    redditComments: null,
+    groupoComments: null,
+  };
   const redditWrapper = new snoowrap({
     userAgent: "groupomania study project",
     clientId: "EDnNl-BJsw5LQQ",
@@ -42,16 +54,38 @@ exports.getCommentsById = (req, res, next) => {
   });
   redditWrapper
     .getSubmission(submissionId)
-    .expandReplies({ limit: 0, depth: 0 })
+    .expandReplies({ limit: 1, depth: 0 })
     .then((singleSubmission) => {
-      let comments = [];
+      let redditComments = [];
       for (const singleComment of singleSubmission.comments) {
-        comments.push({
-          author: singleComment.author.name,
-          body: singleComment.body,
+        redditComments.push({
+          User: {
+            username: singleComment.author.name,
+            imageUrl: null,
+          },
+          text_content: singleComment.body,
         });
       }
-      res.send(comments);
+      redditAndGroupoComments.redditComments = redditComments;
+
+      RedditComment.findAll({
+        where: {
+          submission_id: submissionId,
+        },
+        include: {
+          model: User,
+          attributes: {
+            exclude: ["password"],
+          },
+        },
+      })
+        .then((redditComments) => {
+          redditAndGroupoComments.groupoComments = redditComments;
+          res.send(redditAndGroupoComments);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     });
 };
 
@@ -124,7 +158,6 @@ exports.createRedditComment = (req, res, next) => {
     text_content: textContent,
   })
     .then((success) => {
-      console.log(success);
       res.send(true);
     })
     .catch((error) => {
