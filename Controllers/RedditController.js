@@ -1,5 +1,6 @@
 require("dotenv");
 const snoowrap = require("snoowrap");
+const RedditComment = require("../Models/RedditComment");
 const Helper = require(`${process.cwd()}/libs/Helper`);
 
 exports.getHotSubreddits = (req, res, next) => {
@@ -105,6 +106,26 @@ exports.getSubreddit = (req, res, next) => {
         });
       });
       res.send(subredditData);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+exports.createRedditComment = (req, res, next) => {
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
+  const submissionId = req.body.submissionId;
+  const textContent = req.body.textContent;
+
+  RedditComment.create({
+    submission_id: submissionId,
+    user_id: userId,
+    text_content: textContent,
+  })
+    .then((success) => {
+      console.log(success);
+      res.send(true);
     })
     .catch((error) => {
       console.log(error);

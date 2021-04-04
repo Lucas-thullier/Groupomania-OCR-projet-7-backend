@@ -10,7 +10,10 @@ const Helper = require("../libs/Helper");
 
 exports.signup = (req, res, next) => {
   if (!validator.isStrongPassword(req.body.password)) {
-    throw "Le mot de passe doit contenir: une lettre minuscule, une lettre majuscule, un chiffre, " + "un caractère spécial et doit faire plus de 8 caractères.";
+    throw (
+      "Le mot de passe doit contenir: une lettre minuscule, une lettre majuscule, un chiffre, " +
+      "un caractère spécial et doit faire plus de 8 caractères."
+    );
   }
   if (!validator.isEmail(req.body.email)) {
     throw "L'adresse mail renseignée n'est pas valide.";
@@ -140,9 +143,25 @@ exports.addFriend = (req, res, next) => {
     })
       .then((userWithAllId) => {
         // le group_concat ci dessus renvoie un array avec un seul element contenant une chaine de caractere = a l'ensemble des ids des amis
-        let friendsIds = userWithAllId.getDataValue("friend")[0].getDataValue("friendsIds");
-        friendsIds = friendsIds.split(",");
-        if (!friendsIds.includes(newFriendId)) {
+        if (userWithAllId.getDataValue("friend")[0]) {
+          let friendsIds = userWithAllId.getDataValue("friend")[0].getDataValue("friendsIds");
+          friendsIds = friendsIds.split(",");
+          if (!friendsIds.includes(newFriendId)) {
+            Friend.create({
+              user_a: userId,
+              user_b: newFriendId,
+            })
+              .then(() => {
+                res.send("Creation reussie");
+              })
+              .catch((error) => {
+                console.log("erreur au moment de la creation d'un nouvel ami");
+                console.log(error);
+              });
+          } else {
+            res.send("Incroyable ! Vous etes deja amis");
+          }
+        } else {
           Friend.create({
             user_a: userId,
             user_b: newFriendId,
@@ -154,8 +173,6 @@ exports.addFriend = (req, res, next) => {
               console.log("erreur au moment de la creation d'un nouvel ami");
               console.log(error);
             });
-        } else {
-          res.send("Incroyable ! Vous etes deja amis");
         }
       })
       .catch((error) => {

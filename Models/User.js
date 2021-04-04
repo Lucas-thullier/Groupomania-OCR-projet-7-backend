@@ -3,6 +3,9 @@ const Conversation = require("./Conversation");
 const Message = require("./Message");
 const Friend = require("./Friend");
 const User_Conversation = require("./User_Conversation");
+const FeedPost = require("./FeedPost");
+const FeedPostComments = require("./FeedPostComment");
+const RedditComment = require("./RedditComment");
 
 const sequelize = new Sequelize(
   `mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
@@ -46,13 +49,11 @@ User.belongsToMany(Conversation, {
   through: User_Conversation,
   sourceKey: "id",
   foreignKey: "user_id",
-  // otherKey: "id",
 });
 Conversation.belongsToMany(User, {
   through: User_Conversation,
   sourceKey: "id",
   foreignKey: "conversation_id",
-  // otherKey: "id",
 });
 
 User.belongsToMany(User, {
@@ -63,13 +64,21 @@ User.belongsToMany(User, {
   otherKey: "user_b",
 });
 
-// User.hasMany(User, { foreignKey: "user_a" });
-// Friend.belongsTo(User, { foreignKey: "user_a", targetKey: "id" });
-
 User.hasMany(Message, { foreignKey: "user_id" });
 Message.belongsTo(User, { foreignKey: "user_id" });
 
 Conversation.hasMany(Message, { foreignKey: "conversation_id" });
 Message.belongsTo(Conversation, { foreignKey: "conversation_id" });
 
+User.hasMany(FeedPost, { foreignKey: "user_id" });
+FeedPost.belongsTo(User, { foreignKey: "user_id" });
+
+FeedPost.hasMany(FeedPostComments, { foreignKey: "feedpost_id" });
+FeedPostComments.belongsTo(FeedPost, { foreignKey: "feedpost_id" });
+
+User.hasMany(FeedPostComments, { foreignKey: "user_id" });
+FeedPostComments.belongsTo(User, { foreignKey: "user_id" });
+
+User.hasMany(RedditComment, { foreignKey: "user_id" });
+RedditComment.belongsTo(User, { foreignKey: "user_id" });
 module.exports = User;
