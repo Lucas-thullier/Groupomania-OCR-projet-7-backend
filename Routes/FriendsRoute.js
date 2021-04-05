@@ -4,5 +4,6 @@ const auth = require("../middleware/auth");
 const FriendController = require("../Controllers/FriendController");
 
 router.get("/getAllFriends", auth, FriendController.getAllFriends);
+router.delete("/deleteFriend", auth, FriendController.deleteFriend);
 
 module.exports = router;

@@ -6,6 +6,7 @@ const ConversationController = require("../Controllers/ConversationController");
 
 router.get("/getConversationById", auth, ConversationController.getConversationById);
 router.get("/getAllConvByUserId", auth, ConversationController.getAllConvByUserId);
+router.get("/getConversationByUserAndFriendId", ConversationController.getConversationByUserAndFriendId);
 router.post("/createConversation", auth, ConversationController.createConversation);
 router.post("/changeConversationPicture", auth, multer, ConversationController.changeConversationPicture);
 router.put("/leaveConversation", auth, ConversationController.leaveConversation);

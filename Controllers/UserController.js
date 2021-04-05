@@ -265,8 +265,13 @@ exports.searchFriendUsers = (req, res, next) => {
 };
 
 exports.getFriendsByUserId = (req, res, next) => {
-  const authToken = req.headers.authorization;
-  const userId = Helper.getUserIdWithToken(authToken);
+  let userId;
+  if (req.query.userId) {
+    userId = req.query.userId;
+  } else {
+    const authToken = req.headers.authorization;
+    userId = Helper.getUserIdWithToken(authToken);
+  }
 
   User.findOne({
     where: {

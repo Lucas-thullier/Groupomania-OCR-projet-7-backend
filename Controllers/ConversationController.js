@@ -27,6 +27,60 @@ exports.getConversationById = (req, res, next) => {
     });
 };
 
+exports.getConversationByUserAndFriendId = (req, res, next) => {
+  const authToken = req.headers.authorization;
+  const userId = Helper.getUserIdWithToken(authToken);
+  const friendId = req.query.friendId;
+  User_Conversation.findOne({
+    attributes: ["conversation_id", [sequelize.fn("count", sequelize.col("user_id")), "user_count"]],
+    where: {
+      conversation_id: {
+        [Op.in]: sequelize.literal(
+          // TODO check si risque d'injection
+          `(SELECT conversation_id 
+            FROM user_conversation 
+            WHERE conversation_id IN (
+              SELECT 
+              conversation_id 
+              FROM user_conversation 
+              WHERE user_id=${userId}
+            )
+            AND user_id=${friendId})`
+        ),
+      },
+    },
+    group: ["conversation_id"],
+    having: {
+      user_count: {
+        [Op.eq]: 2,
+      },
+    },
+  })
+    .then((singleUserConversation) => {
+      const conversationId = singleUserConversation.getDataValue("conversation_id");
+      Conversation.findOne({
+        where: {
+          id: conversationId,
+        },
+        include: {
+          model: User,
+          attributes: {
+            exclude: ["password"],
+          },
+        },
+      })
+        .then((conversation) => {
+          res.send(conversation);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
 exports.getAllConvByUserId = (req, res, next) => {
   const authToken = req.headers.authorization;
   const userId = Helper.getUserIdWithToken(authToken);
@@ -105,8 +159,10 @@ exports.createConversation = async (req, res, next) => {
     res.send(true);
   } else {
     if (existantConversation.getDataValue("User_Conversation").as_leave_conversation == 1) {
-      console.log(existantConversation.getDataValue("User_Conversation").id);
-      User_Conversation.update({ as_leave_conversation: 0 }, { where: { id: existantConversation.getDataValue("User_Conversation").id } })
+      User_Conversation.update(
+        { as_leave_conversation: 0 },
+        { where: { id: existantConversation.getDataValue("User_Conversation").id } }
+      )
         .then(() => {
           res.send("Conversation réouverte");
         })
@@ -184,7 +240,6 @@ exports.leaveConversation = (req, res, next) => {
 };
 
 exports.addUserToConversation = (req, res, next) => {
-  console.log("cc");
   const convId = 109;
   const friendId = 3;
   User_Conversation.create({ user_id: 3, conversation_id: convId })
@@ -193,6 +248,5 @@ exports.addUserToConversation = (req, res, next) => {
     })
     .catch((error) => {
       console.log(error);
-      console.log("s");
     });
 };

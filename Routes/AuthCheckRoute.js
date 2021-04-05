@@ -5,7 +5,7 @@ const Friend = require("../Models/Friend");
 const RedditComment = require("../Models/RedditComment");
 
 router.get("/", auth, (req, res, next) => {
-  Friend.sync({ alter: true });
+  // Friend.sync({ alter: true });
   res.status(200).send();
 });
 
