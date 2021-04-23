@@ -1,6 +1,6 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("@lib/SequelizeConnexion");
-const User = require("./User");
+const User = require("@models/User");
 
 class FeedPost extends Model {
   static getConvId(userId, friendId) {

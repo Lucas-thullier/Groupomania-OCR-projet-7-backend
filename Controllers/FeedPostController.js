@@ -1,11 +1,11 @@
 const sequelize = require("sequelize");
 const { Op } = require("sequelize");
-const Conversation = require("../Models/Conversation");
-const User = require("../Models/User");
-const Message = require("../Models/Message");
+const Conversation = require("@models/Conversation");
+const User = require("@models/User");
+const Message = require("@models/Message");
 const Helper = require("@lib/Helper");
-const FeedPost = require("../Models/FeedPost");
-const FeedPostComments = require("../Models/FeedPostComment");
+const FeedPost = require("@models/FeedPost");
+const FeedPostComments = require("@models/FeedPostComment");
 
 exports.getFeedPost = (req, res, next) => {
   const authToken = req.headers.authorization;

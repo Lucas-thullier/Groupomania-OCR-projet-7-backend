@@ -1,11 +1,11 @@
 const sequelize = require("sequelize");
 const { Op } = require("sequelize");
-const User = require("../Models/User");
+const User = require("@models/User");
 const bcrypt = require("bcrypt");
 const jsonWebToken = require("jsonwebtoken");
 const validator = require("validator");
-const Conversation = require("../Models/Conversation");
-const Friend = require("../Models/Friend");
+const Conversation = require("@models/Conversation");
+const Friend = require("@models/Friend");
 const Helper = require("@lib/Helper");
 
 exports.signup = (req, res, next) => {

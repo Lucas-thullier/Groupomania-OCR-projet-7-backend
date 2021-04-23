@@ -1,9 +1,9 @@
 const sequelize = require("sequelize");
 const { Op, where } = require("sequelize");
-const Conversation = require("../Models/Conversation");
-const User = require("../Models/User");
-const Message = require("../Models/Message");
-const User_Conversation = require("../Models/User_Conversation");
+const Conversation = require("@models/Conversation");
+const User = require("@models/User");
+const Message = require("@models/Message");
+const User_Conversation = require("@models/User_Conversation");
 const Helper = require("@lib/Helper");
 
 exports.getConversationById = (req, res, next) => {

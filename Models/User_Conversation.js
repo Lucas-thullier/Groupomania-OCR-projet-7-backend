@@ -1,7 +1,7 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("@lib/SequelizeConnexion");
-const User = require("./User");
-const Conversation = require("./Conversation");
+const User = require("@models/User");
+const Conversation = require("@models/Conversation");
 
 class User_Conversation extends Model {}
 

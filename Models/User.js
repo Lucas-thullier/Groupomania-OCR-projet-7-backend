@@ -1,12 +1,12 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("@lib/SequelizeConnexion");
-const Conversation = require("./Conversation");
-const Message = require("./Message");
-const Friend = require("./Friend");
-const User_Conversation = require("./User_Conversation");
-const FeedPost = require("./FeedPost");
-const FeedPostComments = require("./FeedPostComment");
-const RedditComment = require("./RedditComment");
+const Conversation = require("@models/Conversation");
+const Message = require("@models/Message");
+const Friend = require("@models/Friend");
+const User_Conversation = require("@models/User_Conversation");
+const FeedPost = require("@models/FeedPost");
+const FeedPostComments = require("@models/FeedPostComment");
+const RedditComment = require("@models/RedditComment");
 
 class User extends Model {}
 

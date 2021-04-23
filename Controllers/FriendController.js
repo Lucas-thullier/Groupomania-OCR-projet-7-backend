@@ -1,4 +1,4 @@
-const Friend = require("../Models/Friend");
+const Friend = require("@models/Friend");
 const Helper = require("@lib/Helper");
 const { Op } = require("sequelize");
 

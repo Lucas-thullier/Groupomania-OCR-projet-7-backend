@@ -1,6 +1,6 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("@lib/SequelizeConnexion");
-const User = require("./User");
+const User = require("@models/User");
 
 class Friend extends Model {
   static getFriendsOf(id) {
