@@ -1,4 +1,4 @@
-const { Model, DataTypes } = require("sequelize");
+const { Model, DataTypes, Op } = require("sequelize");
 const sequelize = require("@lib/SequelizeConnexion");
 const Conversation = require("@models/Conversation");
 const Message = require("@models/Message");
@@ -17,6 +17,37 @@ class User extends Model {
       exclude: ["password"],
     });
     return singleUser;
+  }
+
+  static async searchByName(searchContent, userId) {
+    const searchedUsers = await User.findAll({
+      where: {
+        username: {
+          [Op.like]: `%${searchContent}%`,
+        },
+        id: {
+          [Op.ne]: userId,
+        },
+      },
+      attributes: {
+        exclude: ["password"],
+      },
+    });
+
+    return searchedUsers;
+  }
+
+  static async changeProfilPicture(userId, imagePath) {
+    await User.update(
+      {
+        imageUrl: imagePath,
+      },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
   }
 }
 

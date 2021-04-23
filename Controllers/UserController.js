@@ -1,10 +1,7 @@
-const sequelize = require("sequelize");
-const { Op } = require("sequelize");
 const User = require("@models/User");
 const bcrypt = require("bcrypt");
 const jsonWebToken = require("jsonwebtoken");
 const validator = require("validator");
-const Friend = require("@models/Friend");
 const Helper = require("@lib/Helper");
 
 exports.signup = (req, res, next) => {
@@ -59,258 +56,45 @@ exports.login = (req, res, next) => {
     .catch((error) => res.status(500).json({ error }));
 };
 
-exports.searchUser = (req, res, next) => {
-  const searchContent = req.query.searchContent;
-  const authToken = req.headers.authorization;
-  const userId = Helper.getUserIdWithToken(authToken);
-  User.findAll({
-    where: {
-      username: {
-        [Op.like]: `%${searchContent}%`,
-      },
-    },
-    attributes: {
-      exclude: ["password"],
-    },
-    include: {
-      model: User,
-      as: "friend",
-      attributes: {
-        exclude: ["password"],
-      },
-      through: {
-        attributes: [],
-      },
-    },
-  })
-    .then((userLikeSearch) => {
-      for (const singleUser in userLikeSearch) {
-        for (const singleFriend of userLikeSearch) {
-          if (singleFriend.id == userId) {
-            singleFriend.setDataValue("isAlreadyFriend", true);
-            singleUser.isAlreadyFriend = true;
-          }
-        }
-      }
-      userLikeSearch.forEach((singleUser, key) => {
-        if (
-          singleUser.getDataValue("friend").some((singleFriend) => {
-            if (singleFriend.id == userId) {
-              return true;
-            }
-          })
-        ) {
-          singleUser.setDataValue("isAlreadyFriend", true);
-        }
-      });
-      // userLikeSearch.map((singleUser) => {
-      //   singleUser = singleUser.getDataValue("friend").map((singleFriend) => {
-      //     console.log(singleFriend.id, userId);
-      //     if (singleFriend.id == userId) {
-      //       singleUser.setDataValue("isAlreadyFriend", true);
-      //       singleUser.isAlreadyFriend = true;
-      //     }
-      //     return singleFriend;
-      //   });
-      //   return singleUser;
-      // });
-      res.send(userLikeSearch);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-
 exports.getById = async (req, res, next) => {
   const userId = req.params.id;
   User.getOne(userId)
     .then((singleUser) => {
       res.send(singleUser);
+      logger.info(`get user by ${userId} OK`);
     })
     .catch((error) => {
-      console.log(error);
+      logger.error(`get user by ${userId} fail`);
+      logger.error(error);
     });
 };
 
-exports.addFriend = (req, res, next) => {
-  const authToken = req.headers.authorization;
-  const userId = Helper.getUserIdWithToken(authToken);
-  const newFriendId = req.body.newFriendId;
-  if (userId == newFriendId) {
-    res.send("refuse car ami = user connecte");
-  } else {
-    User.findOne({
-      where: {
-        id: userId,
-      },
-      include: {
-        model: User,
-        as: "friend",
-        attributes: [[sequelize.fn("GROUP_CONCAT", sequelize.col("friend.id")), "friendsIds"]],
-        through: {
-          attributes: [],
-        },
-      },
-      attributes: [],
-    })
-      .then((userWithAllId) => {
-        // le group_concat ci dessus renvoie un array avec un seul element contenant une chaine de caractere = a l'ensemble des ids des amis
-        if (userWithAllId.getDataValue("friend")[0]) {
-          let friendsIds = userWithAllId.getDataValue("friend")[0].getDataValue("friendsIds");
-          friendsIds = friendsIds.split(",");
-          if (!friendsIds.includes(newFriendId)) {
-            Friend.create({
-              user_a: userId,
-              user_b: newFriendId,
-              is_pending: 0,
-            })
-              .then(() => {
-                Friend.create({
-                  user_a: newFriendId,
-                  user_b: userId,
-                  is_pending: 1,
-                })
-                  .then(() => {
-                    res.send("Creation reussie");
-                  })
-                  .catch((error) => {
-                    console.log("erreur au moment de la creation d'un nouvel ami cote ami");
-                    console.log(error);
-                  });
-              })
-              .catch((error) => {
-                console.log("erreur au moment de la creation d'un nouvel ami");
-                console.log(error);
-              });
-          } else {
-            res.send("Incroyable ! Vous etes deja amis");
-          }
-        } else {
-          Friend.create({
-            user_a: userId,
-            user_b: newFriendId,
-            is_pending: 0,
-          })
-            .then(() => {
-              Friend.create({
-                user_a: newFriendId,
-                user_b: userId,
-                is_pending: 1,
-              })
-                .then(() => {
-                  res.send("Creation reussie");
-                })
-                .catch((error) => {
-                  console.log("erreur au moment de la creation d'un nouvel ami cote ami");
-                  console.log(error);
-                });
-            })
-            .catch((error) => {
-              console.log("erreur au moment de la creation d'un nouvel ami");
-              console.log(error);
-            });
-        }
-      })
-      .catch((error) => {
-        console.log("erreur au moment de la recuperation de l'ensemble des amis de l'utilisateur");
-        console.log(error);
-      });
-  }
-};
-
-exports.searchFriendUsers = (req, res, next) => {
-  const authToken = req.headers.authorization;
-  const userId = Helper.getUserIdWithToken(authToken);
+exports.searchByName = (req, res, next) => {
   const searchContent = req.query.searchContent;
-  User.findOne({
-    where: {
-      id: userId,
-    },
-    include: {
-      model: User,
-      as: "friend",
-      where: {
-        username: {
-          [Op.like]: `%${searchContent}%`,
-        },
-      },
-      attributes: {
-        exclude: ["password"],
-      },
-      through: {
-        attributes: [],
-      },
-    },
-    attributes: {
-      exclude: ["password"],
-    },
-  })
-    .then((result) => {
-      if (result && result.getDataValue("friend")) {
-        res.send(result.getDataValue("friend"));
-      } else {
-        res.send("");
-      }
+  const authToken = req.headers.authorization;
+  const userId = getUserIdWithToken(authToken);
+
+  User.searchByName(searchContent, userId)
+    .then((searchedUsers) => {
+      res.send(searchedUsers);
+      logger.info("Search User by username OK");
     })
     .catch((error) => {
-      console.log(error);
-    });
-};
-
-exports.getFriendsByUserId = (req, res, next) => {
-  let userId;
-  if (req.query.userId) {
-    userId = req.query.userId;
-  } else {
-    const authToken = req.headers.authorization;
-    userId = Helper.getUserIdWithToken(authToken);
-  }
-
-  User.findOne({
-    where: {
-      id: userId,
-    },
-    attributes: {
-      exclude: ["password"],
-    },
-    include: {
-      model: User,
-      as: "friend",
-      attributes: {
-        exclude: ["password", "friend"],
-      },
-      through: {
-        attributes: [],
-      },
-    },
-  })
-    .then((userWithFriends) => {
-      const friends = userWithFriends.getDataValue("friend");
-      res.send(friends);
-    })
-    .catch((error) => {
-      console.log(error);
+      logger.error("Search User by username fail");
     });
 };
 
 exports.changeProfilPicture = (req, res, next) => {
   const authToken = req.headers.authorization;
   const userId = Helper.getUserIdWithToken(authToken);
-  console.log(req.file);
-  User.update(
-    {
-      imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
-    },
-    {
-      where: {
-        id: userId,
-      },
-    }
-  )
-    .then((updatedUser) => {
-      res.send("update effectue");
+  const imagePath = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
+
+  User.changeProfilPicture(userId, imagePath)
+    .then(() => {
+      logger.info(`Change userPicture OK : ${imagePath}`);
     })
     .catch((error) => {
-      console.log(error);
+      logger.info(`Change userPicture fail : ${imagePath}`);
+      logger.error(error);
     });
 };

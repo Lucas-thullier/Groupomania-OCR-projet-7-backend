@@ -14,7 +14,13 @@ class Message extends Model {
     });
   }
 
-  static createNewMessage() {}
+  static async postMessage(messageContent, userId, conversationId) {
+    await Message.create({
+      text_content: messageContent,
+      user_id: userId,
+      conversation_id: conversationId,
+    });
+  }
 }
 
 Message.init(

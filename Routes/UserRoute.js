@@ -7,8 +7,8 @@ const userController = require("@controllers/UserController");
 router.post("/signup", userController.signup);
 router.post("/login", userController.login);
 
-router.get("/search", auth, userController.searchUser);
-router.get("/:id", auth, userController.getById);
+router.get("/search", userController.searchByName);
+// router.get("/:id", userController.getById);
 // router.get("/searchFriendUsers", auth, userController.searchFriendUsers);
 // router.get("/getFriendsByUserId", auth, userController.getFriendsByUserId);
 

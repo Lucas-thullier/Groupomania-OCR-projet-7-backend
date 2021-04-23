@@ -1,0 +1,17 @@
+{"message":"get user by all OK","level":"info","service":"user-service"}
+{"message":"get user by all OK","level":"info","service":"user-service"}
+{"message":"get user by all OK","level":"info","service":"user-service"}
+{"message":"get user by test OK","level":"info","service":"user-service"}
+{"message":"get user by all OK","level":"info","service":"user-service"}
+{"message":"get user by all OK","level":"info","service":"user-service"}
+{"message":"fetching popular subreddits OK","level":"info","service":"user-service"}
+{"message":"fetching popular subreddits OK","level":"info","service":"user-service"}
+{"message":"fetching popular subreddits OK","level":"info","service":"user-service"}
+{"message":"fetching popular subreddits OK","level":"info","service":"user-service"}
+{"message":"fetching hot submissions OK","level":"info","service":"user-service"}
+{"message":"fetching popular subreddits OK","level":"info","service":"user-service"}
+{"message":"fetching hot submissions OK","level":"info","service":"user-service"}
+{"message":"error during fetching comments","level":"error","service":"user-service"}
+{"level":"error","service":"user-service"}
+{"message":"error during fetching comments","level":"error","service":"user-service"}
+{"level":"error","service":"user-service"}
