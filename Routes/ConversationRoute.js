@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth");
-const multer = require("../middleware/multer-config");
-const ConversationController = require("../Controllers/ConversationController");
+const auth = require("@middlewares/auth");
+const multer = require("@middlewares/multer-config");
+const ConversationController = require("@controllers/ConversationController");
 
 router.get("/getConversationById", auth, ConversationController.getConversationById);
 router.get("/getAllConvByUserId", auth, ConversationController.getAllConvByUserId);

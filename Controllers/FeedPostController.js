@@ -3,7 +3,7 @@ const { Op } = require("sequelize");
 const Conversation = require("../Models/Conversation");
 const User = require("../Models/User");
 const Message = require("../Models/Message");
-const Helper = require("../libs/Helper");
+const Helper = require("@lib/Helper");
 const FeedPost = require("../Models/FeedPost");
 const FeedPostComments = require("../Models/FeedPostComment");
 

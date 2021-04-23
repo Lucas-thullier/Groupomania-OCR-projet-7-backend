@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth");
+const auth = require("@middlewares/auth");
 
-const RedditController = require("../Controllers/RedditController");
+const RedditController = require("@controllers/RedditController");
 
 router.get("/getHotSubreddits", RedditController.getHotSubreddits);
 router.get("/getCommentsById", RedditController.getCommentsById);

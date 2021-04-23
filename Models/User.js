@@ -1,4 +1,5 @@
-const { Sequelize, Model, DataTypes } = require("sequelize");
+const { Model, DataTypes } = require("sequelize");
+const sequelize = require("@lib/SequelizeConnexion");
 const Conversation = require("./Conversation");
 const Message = require("./Message");
 const Friend = require("./Friend");
@@ -6,10 +7,6 @@ const User_Conversation = require("./User_Conversation");
 const FeedPost = require("./FeedPost");
 const FeedPostComments = require("./FeedPostComment");
 const RedditComment = require("./RedditComment");
-
-const sequelize = new Sequelize(
-  `mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
-);
 
 class User extends Model {}
 
@@ -81,4 +78,5 @@ FeedPostComments.belongsTo(User, { foreignKey: "user_id" });
 
 User.hasMany(RedditComment, { foreignKey: "user_id" });
 RedditComment.belongsTo(User, { foreignKey: "user_id" });
+
 module.exports = User;

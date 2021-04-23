@@ -4,7 +4,7 @@ const Conversation = require("../Models/Conversation");
 const User = require("../Models/User");
 const Message = require("../Models/Message");
 const User_Conversation = require("../Models/User_Conversation");
-const Helper = require("../libs/Helper");
+const Helper = require("@lib/Helper");
 
 exports.getConversationById = (req, res, next) => {
   Conversation.findOne({

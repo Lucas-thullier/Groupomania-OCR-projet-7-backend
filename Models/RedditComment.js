@@ -1,7 +1,5 @@
-const { Sequelize, Model, DataTypes } = require("sequelize");
-const sequelize = new Sequelize(
-  `mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
-);
+const { Model, DataTypes } = require("sequelize");
+const sequelize = require("@lib/SequelizeConnexion");
 
 class RedditComment extends Model {}
 

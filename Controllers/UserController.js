@@ -6,7 +6,7 @@ const jsonWebToken = require("jsonwebtoken");
 const validator = require("validator");
 const Conversation = require("../Models/Conversation");
 const Friend = require("../Models/Friend");
-const Helper = require("../libs/Helper");
+const Helper = require("@lib/Helper");
 
 exports.signup = (req, res, next) => {
   if (!validator.isStrongPassword(req.body.password)) {

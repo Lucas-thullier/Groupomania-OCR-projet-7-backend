@@ -1,7 +1,7 @@
 const Conversation = require("../Models/Conversation");
 const Message = require("../Models/Message");
 const User = require("../Models/User");
-const Helper = require(`${process.cwd()}/libs/Helper`);
+const Helper = require(`@lib/Helper`);
 
 exports.postMessage = (req, res, next) => {
   const messageContent = req.body.messageContent;

@@ -1,5 +1,5 @@
 const Friend = require("../Models/Friend");
-const Helper = require("../libs/Helper");
+const Helper = require("@lib/Helper");
 const { Op } = require("sequelize");
 
 exports.getAllFriends = (req, res, next) => {
