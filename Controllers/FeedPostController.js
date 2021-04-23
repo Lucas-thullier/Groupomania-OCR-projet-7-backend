@@ -1,3 +1,5 @@
+const sequelize = require("sequelize");
+const { Op } = require("sequelize");
 const Conversation = require("../Models/Conversation");
 const User = require("../Models/User");
 const Message = require("../Models/Message");
@@ -8,31 +10,36 @@ const FeedPostComments = require("../Models/FeedPostComment");
 exports.getFeedPost = (req, res, next) => {
   const authToken = req.headers.authorization;
   const userId = Helper.getUserIdWithToken(authToken);
-  User.findOne({
+  FeedPost.findAll({
     where: {
-      id: userId,
+      user_id: {
+        [Op.or]: [
+          userId,
+          {
+            [Op.in]: sequelize.literal(
+              // TODO check si risque d'injection
+              `(SELECT friend.id 
+                FROM users AS User 
+                LEFT OUTER JOIN (
+                  friends AS friendFriend 
+                    INNER JOIN users AS friend 
+                    ON friend.id = friendFriend.user_b) 
+                ON User.id = friendFriend.user_a 
+                WHERE User.id = '${userId}')`
+            ),
+          },
+        ],
+      },
     },
-    attributes: ["id"],
     include: {
       model: User,
-      as: "friend",
-      attributes: ["id", "imageUrl", "username"],
-      include: {
-        model: FeedPost,
+      attributes: {
+        exclude: ["password"],
       },
-      through: [],
     },
+    order: [["createdAt", "DESC"]],
   })
-    .then((userWithFriendPost) => {
-      let feedPost = [];
-      userWithFriendPost.getDataValue("friend").forEach((friendWithPost) => {
-        friendWithPost.getDataValue("FeedPosts").forEach((post) => {
-          feedPost.push({
-            friend: friendWithPost,
-            post: post,
-          });
-        });
-      });
+    .then((feedPost) => {
       res.send(feedPost);
     })
     .catch((error) => {
