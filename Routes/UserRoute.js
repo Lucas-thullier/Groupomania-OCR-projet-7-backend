@@ -7,12 +7,12 @@ const userController = require("@controllers/UserController");
 router.post("/signup", userController.signup);
 router.post("/login", userController.login);
 
-router.get("/searchUser", auth, userController.searchUser);
-router.get("/userById", auth, userController.userById);
-router.get("/searchFriendUsers", auth, userController.searchFriendUsers);
-router.get("/getFriendsByUserId", auth, userController.getFriendsByUserId);
+router.get("/search", auth, userController.searchUser);
+router.get("/:id", auth, userController.getById);
+// router.get("/searchFriendUsers", auth, userController.searchFriendUsers);
+// router.get("/getFriendsByUserId", auth, userController.getFriendsByUserId);
 
-router.post("/addFriend", auth, userController.addFriend);
-router.post("/changeProfilPicture", auth, multer, userController.changeProfilPicture);
+// router.post("/addFriend", auth, userController.addFriend);
+// router.post("/changeProfilPicture", auth, multer, userController.changeProfilPicture);
 
 module.exports = router;

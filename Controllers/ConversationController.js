@@ -1,8 +1,7 @@
 const sequelize = require("sequelize");
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 const Conversation = require("@models/Conversation");
 const User = require("@models/User");
-const Message = require("@models/Message");
 const User_Conversation = require("@models/User_Conversation");
 const Helper = require("@lib/Helper");
 

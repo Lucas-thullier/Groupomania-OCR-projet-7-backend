@@ -4,7 +4,6 @@ const User = require("@models/User");
 const bcrypt = require("bcrypt");
 const jsonWebToken = require("jsonwebtoken");
 const validator = require("validator");
-const Conversation = require("@models/Conversation");
 const Friend = require("@models/Friend");
 const Helper = require("@lib/Helper");
 
@@ -122,15 +121,9 @@ exports.searchUser = (req, res, next) => {
     });
 };
 
-exports.userById = (req, res, next) => {
-  const authToken = req.headers.authorization;
-  const searchedUserId = req.query.userId;
-  User.findOne({
-    where: {
-      id: searchedUserId,
-    },
-    exclude: ["password"],
-  })
+exports.getById = async (req, res, next) => {
+  const userId = req.params.id;
+  User.getOne(userId)
     .then((singleUser) => {
       res.send(singleUser);
     })

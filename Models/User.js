@@ -8,7 +8,17 @@ const FeedPost = require("@models/FeedPost");
 const FeedPostComments = require("@models/FeedPostComment");
 const RedditComment = require("@models/RedditComment");
 
-class User extends Model {}
+class User extends Model {
+  static async getOne(id) {
+    const singleUser = await this.findOne({
+      where: {
+        id: id,
+      },
+      exclude: ["password"],
+    });
+    return singleUser;
+  }
+}
 
 User.init(
   {
@@ -64,14 +74,8 @@ User.belongsToMany(User, {
 User.hasMany(Message, { foreignKey: "user_id" });
 Message.belongsTo(User, { foreignKey: "user_id" });
 
-Conversation.hasMany(Message, { foreignKey: "conversation_id" });
-Message.belongsTo(Conversation, { foreignKey: "conversation_id" });
-
 User.hasMany(FeedPost, { foreignKey: "user_id" });
 FeedPost.belongsTo(User, { foreignKey: "user_id" });
-
-FeedPost.hasMany(FeedPostComments, { foreignKey: "feedpost_id" });
-FeedPostComments.belongsTo(FeedPost, { foreignKey: "feedpost_id" });
 
 User.hasMany(FeedPostComments, { foreignKey: "user_id" });
 FeedPostComments.belongsTo(User, { foreignKey: "user_id" });

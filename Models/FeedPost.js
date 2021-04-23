@@ -1,6 +1,7 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("@lib/SequelizeConnexion");
 const User = require("@models/User");
+const FeedPostComment = require("@models/FeedPostComment");
 
 class FeedPost extends Model {
   static getConvId(userId, friendId) {
@@ -38,5 +39,8 @@ FeedPost.init(
   },
   { sequelize, modelName: "FeedPost", tableName: "feedposts" }
 );
+
+FeedPost.hasMany(FeedPostComment, { foreignKey: "feedpost_id" });
+FeedPostComment.belongsTo(FeedPost, { foreignKey: "feedpost_id" });
 
 module.exports = FeedPost;

@@ -2,8 +2,19 @@ require("module-alias/register");
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
+const winston = require("winston");
 
 const app = express();
+
+logger = winston.createLogger({
+  level: "info",
+  format: winston.format.json(),
+  defaultMeta: { service: "user-service" },
+  transports: [
+    new winston.transports.File({ filename: "log/error.log", level: "error" }),
+    new winston.transports.File({ filename: "log/combined.log" }),
+  ],
+});
 
 const UserRoute = require("@routes/UserRoute");
 const FeedPostRoute = require("@routes/FeedPostRoute");

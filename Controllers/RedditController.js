@@ -1,4 +1,3 @@
-const { Op } = require("sequelize");
 const snoowrap = require("snoowrap");
 const RedditComment = require("@models/RedditComment");
 const User = require("@models/User");
