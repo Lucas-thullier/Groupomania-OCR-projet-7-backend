@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth");
-const Friend = require("../Models/Friend");
-const RedditComment = require("../Models/RedditComment");
+const auth = require("../middlewares/auth");
+const Friend = require("../models/Friend");
+const RedditComment = require("../models/RedditComment");
 
 router.get("/", auth, (req, res, next) => {
   // Friend.sync({ alter: true });

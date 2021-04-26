@@ -1,8 +1,8 @@
 require("dotenv");
 const { Op } = require("sequelize");
 const snoowrap = require("snoowrap");
-const RedditComment = require("../Models/RedditComment");
-const User = require("../Models/User");
+const RedditComment = require("../models/RedditComment");
+const User = require("../models/User");
 const Helper = require(`${process.cwd()}/libs/Helper`);
 
 exports.getHotSubreddits = (req, res, next) => {

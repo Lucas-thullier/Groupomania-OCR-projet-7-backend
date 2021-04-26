@@ -1,18 +1,18 @@
 require("dotenv").config();
 const express = require("express");
 const fs = require("fs");
-const auth = require("./middleware/auth");
+const auth = require("./middlewares/auth");
 const path = require("path");
 
 const app = express();
 
-const UserRoute = require("./Routes/UserRoute");
-const FeedPostRoute = require("./Routes/FeedPostRoute");
-const ConversationRoute = require("./Routes/ConversationRoute");
-const FriendsRoute = require("./Routes/FriendsRoute");
-const MessageRoute = require("./Routes/MessageRoute");
-const AuthCheckRoute = require("./Routes/AuthCheckRoute");
-const RedditRoute = require("./Routes/RedditRoute");
+const UserRoute = require("./routes/UserRoute");
+const FeedPostRoute = require("./routes/FeedPostRoute");
+const ConversationRoute = require("./routes/ConversationRoute");
+const FriendsRoute = require("./routes/FriendsRoute");
+const MessageRoute = require("./routes/MessageRoute");
+const AuthCheckRoute = require("./routes/AuthCheckRoute");
+const RedditRoute = require("./routes/RedditRoute");
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
