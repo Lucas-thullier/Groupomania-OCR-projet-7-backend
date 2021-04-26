@@ -1,32 +1,27 @@
-const { Sequelize, Model, DataTypes } = require("sequelize");
-const sequelize = new Sequelize(
-  `mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
-);
-
-class RedditComment extends Model {}
-
-RedditComment.init(
-  {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true,
+"use strict";
+const { Model } = require("sequelize");
+module.exports = (sequelize, DataTypes) => {
+  class RedditComment extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  }
+  RedditComment.init(
+    {
+      id: DataTypes.INTEGER,
+      submissionId: DataTypes.STRING,
+      userId: DataTypes.INTEGER,
+      textContent: DataTypes.STRING,
     },
-    submission_id: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    user_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-    },
-    text_content: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-  },
-  { sequelize, modelName: "RedditComment", tableName: "reddit_comments" }
-);
-
-module.exports = RedditComment;
+    {
+      sequelize,
+      modelName: "RedditComment",
+    }
+  );
+  return RedditComment;
+};

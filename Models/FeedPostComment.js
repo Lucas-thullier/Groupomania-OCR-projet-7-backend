@@ -1,34 +1,28 @@
-const { Sequelize, Model, DataTypes } = require("sequelize");
-const sequelize = new Sequelize(`mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
-
-class FeedPostComments extends Model {}
-
-FeedPostComments.init(
-  {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true,
+"use strict";
+const { Model } = require("sequelize");
+module.exports = (sequelize, DataTypes) => {
+  class FeedPostComment extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  }
+  FeedPostComment.init(
+    {
+      id: DataTypes.INTEGER,
+      feedpostId: DataTypes.INTEGER,
+      userId: DataTypes.INTEGER,
+      textContent: DataTypes.STRING,
+      imageUrl: DataTypes.STRING,
     },
-    feedpost_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-    },
-    user_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-    },
-    text_content: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    image_url: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-  },
-  { sequelize, modelName: "FeedPostComment", tableName: "feedposts_comments" }
-);
-
-module.exports = FeedPostComments;
+    {
+      sequelize,
+      modelName: "FeedPostComment",
+    }
+  );
+  return FeedPostComment;
+};

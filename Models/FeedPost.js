@@ -1,42 +1,27 @@
-const { Sequelize, Model, DataTypes } = require("sequelize");
-const User = require("./User");
-const sequelize = new Sequelize(`mysql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
-
-class FeedPost extends Model {
-  static getConvId(userId, friendId) {
-    console.log(Conversation);
-    User.findOne({
-      where: {
-        id: 1,
-      },
-    }).then((user) => {
-      user.addConversation();
-    });
+"use strict";
+const { Model } = require("sequelize");
+module.exports = (sequelize, DataTypes) => {
+  class FeedPost extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
   }
-}
-
-FeedPost.init(
-  {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true,
+  FeedPost.init(
+    {
+      id: DataTypes.INTEGER,
+      user_id: DataTypes.INTEGER,
+      textContent: DataTypes.STRING,
+      imageUrl: DataTypes.STRING,
     },
-    user_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-    },
-    text_content: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    image_url: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-  },
-  { sequelize, modelName: "FeedPost", tableName: "feedposts" }
-);
-
-module.exports = FeedPost;
+    {
+      sequelize,
+      modelName: "FeedPost",
+    }
+  );
+  return FeedPost;
+};
