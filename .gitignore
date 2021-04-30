@@ -1,7 +1,12 @@
 .env
-node_modules/
-images/*
-!images/.gitkeep
 .vscode/
-config/*
+node_modules/
+
+/images/*
+!images/.gitkeep
+
+/config/*
 !config/.gitkeep
+
+/log/*
+!log/.gitkeep
