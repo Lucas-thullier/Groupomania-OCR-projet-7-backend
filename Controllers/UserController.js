@@ -1,12 +1,8 @@
-const sequelize = require("sequelize");
-const { Op } = require("sequelize");
-const User = require("../models/User");
+const { User } = require("@models/index");
 const bcrypt = require("bcrypt");
 const jsonWebToken = require("jsonwebtoken");
 const validator = require("validator");
-const Conversation = require("../models/Conversation");
-const Friend = require("../models/Friend");
-const Helper = require("../libs/Helper");
+const { getUserIdWithToken } = require("@libs/Helper");
 
 exports.signup = (req, res, next) => {
   if (!validator.isStrongPassword(req.body.password)) {
@@ -15,35 +11,42 @@ exports.signup = (req, res, next) => {
       "un caractère spécial et doit faire plus de 8 caractères."
     );
   }
+
   if (!validator.isEmail(req.body.email)) {
     throw "L'adresse mail renseignée n'est pas valide.";
   }
+
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
-      User.create({
-        username: req.body.username,
-        email: req.body.email,
-        password: hash,
-      })
-        .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
-        .catch((error) => res.status(400).json({ error }));
+      const username = req.body.username;
+      const email = req.body.email;
+      User.new(username, email, hash)
+        .then(() => {
+          res.status(201).json({ message: "Utilisateur créé !" });
+          logger.info("User created !");
+        })
+        .catch((error) => {
+          res.status(400).json({ error });
+          logger.error("User creation failed !");
+        });
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => {
+      res.status(500).json({ error });
+      logger.error("password encryption failed");
+    });
 };
 
 exports.login = (req, res, next) => {
-  User.findOne({
-    where: {
-      email: req.body.email,
-    },
-  })
+  const userEmail = req.body.email;
+  const passwordFromRequest = req.body.password;
+  User.findByMail(userEmail)
     .then((user) => {
       if (!user) {
         return res.statut(401).json({ error: "Utilisateur non trouvé !" });
       }
       bcrypt
-        .compare(req.body.password, user.password)
+        .compare(passwordFromRequest, user.password)
         .then((valid) => {
           if (!valid) {
             return res.statut(401).json({ error: "Mot de passe incorrect !" });
@@ -54,270 +57,73 @@ exports.login = (req, res, next) => {
               expiresIn: "24h",
             }),
           });
+          logger.info("Connexion success");
         })
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => {
+          res.status(500).json({ error });
+          logger.error("Comparing password failed");
+        });
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => {
+      res.status(500).json({ error });
+      logger.error("Getting user from database failed");
+    });
 };
 
 exports.searchUser = (req, res, next) => {
   const searchContent = req.query.searchContent;
-  const authToken = req.headers.authorization;
-  const userId = Helper.getUserIdWithToken(authToken);
-  User.findAll({
-    where: {
-      username: {
-        [Op.like]: `%${searchContent}%`,
-      },
-    },
-    attributes: {
-      exclude: ["password"],
-    },
-    include: {
-      model: User,
-      as: "friend",
-      attributes: {
-        exclude: ["password"],
-      },
-      through: {
-        attributes: [],
-      },
-    },
-  })
+
+  User.searchByUsername(searchContent)
     .then((userLikeSearch) => {
-      for (const singleUser in userLikeSearch) {
-        for (const singleFriend of userLikeSearch) {
-          if (singleFriend.id == userId) {
-            singleFriend.setDataValue("isAlreadyFriend", true);
-            singleUser.isAlreadyFriend = true;
-          }
-        }
-      }
-      userLikeSearch.forEach((singleUser, key) => {
-        if (
-          singleUser.getDataValue("friend").some((singleFriend) => {
-            if (singleFriend.id == userId) {
-              return true;
-            }
-          })
-        ) {
-          singleUser.setDataValue("isAlreadyFriend", true);
-        }
-      });
-      // userLikeSearch.map((singleUser) => {
-      //   singleUser = singleUser.getDataValue("friend").map((singleFriend) => {
-      //     console.log(singleFriend.id, userId);
-      //     if (singleFriend.id == userId) {
-      //       singleUser.setDataValue("isAlreadyFriend", true);
-      //       singleUser.isAlreadyFriend = true;
-      //     }
-      //     return singleFriend;
-      //   });
-      //   return singleUser;
-      // });
       res.send(userLikeSearch);
+      logger.info("Sending Users fetched");
     })
     .catch((error) => {
       console.log(error);
+      logger.error("Error during search by user");
     });
 };
 
 exports.userById = (req, res, next) => {
-  const authToken = req.headers.authorization;
-  const searchedUserId = req.query.userId;
-  User.findOne({
-    where: {
-      id: searchedUserId,
-    },
-    exclude: ["password"],
-  })
+  const userId = req.query.userId;
+
+  User.getById(userId)
     .then((singleUser) => {
       res.send(singleUser);
+      logger.info("Fetching by Id success");
     })
     .catch((error) => {
-      console.log(error);
-    });
-};
-
-exports.addFriend = (req, res, next) => {
-  const authToken = req.headers.authorization;
-  const userId = Helper.getUserIdWithToken(authToken);
-  const newFriendId = req.body.newFriendId;
-  if (userId == newFriendId) {
-    res.send("refuse car ami = user connecte");
-  } else {
-    User.findOne({
-      where: {
-        id: userId,
-      },
-      include: {
-        model: User,
-        as: "friend",
-        attributes: [[sequelize.fn("GROUP_CONCAT", sequelize.col("friend.id")), "friendsIds"]],
-        through: {
-          attributes: [],
-        },
-      },
-      attributes: [],
-    })
-      .then((userWithAllId) => {
-        // le group_concat ci dessus renvoie un array avec un seul element contenant une chaine de caractere = a l'ensemble des ids des amis
-        if (userWithAllId.getDataValue("friend")[0]) {
-          let friendsIds = userWithAllId.getDataValue("friend")[0].getDataValue("friendsIds");
-          friendsIds = friendsIds.split(",");
-          if (!friendsIds.includes(newFriendId)) {
-            Friend.create({
-              user_a: userId,
-              user_b: newFriendId,
-              is_pending: 0,
-            })
-              .then(() => {
-                Friend.create({
-                  user_a: newFriendId,
-                  user_b: userId,
-                  is_pending: 1,
-                })
-                  .then(() => {
-                    res.send("Creation reussie");
-                  })
-                  .catch((error) => {
-                    console.log("erreur au moment de la creation d'un nouvel ami cote ami");
-                    console.log(error);
-                  });
-              })
-              .catch((error) => {
-                console.log("erreur au moment de la creation d'un nouvel ami");
-                console.log(error);
-              });
-          } else {
-            res.send("Incroyable ! Vous etes deja amis");
-          }
-        } else {
-          Friend.create({
-            user_a: userId,
-            user_b: newFriendId,
-            is_pending: 0,
-          })
-            .then(() => {
-              Friend.create({
-                user_a: newFriendId,
-                user_b: userId,
-                is_pending: 1,
-              })
-                .then(() => {
-                  res.send("Creation reussie");
-                })
-                .catch((error) => {
-                  console.log("erreur au moment de la creation d'un nouvel ami cote ami");
-                  console.log(error);
-                });
-            })
-            .catch((error) => {
-              console.log("erreur au moment de la creation d'un nouvel ami");
-              console.log(error);
-            });
-        }
-      })
-      .catch((error) => {
-        console.log("erreur au moment de la recuperation de l'ensemble des amis de l'utilisateur");
-        console.log(error);
-      });
-  }
-};
-
-exports.searchFriendUsers = (req, res, next) => {
-  const authToken = req.headers.authorization;
-  const userId = Helper.getUserIdWithToken(authToken);
-  const searchContent = req.query.searchContent;
-  User.findOne({
-    where: {
-      id: userId,
-    },
-    include: {
-      model: User,
-      as: "friend",
-      where: {
-        username: {
-          [Op.like]: `%${searchContent}%`,
-        },
-      },
-      attributes: {
-        exclude: ["password"],
-      },
-      through: {
-        attributes: [],
-      },
-    },
-    attributes: {
-      exclude: ["password"],
-    },
-  })
-    .then((result) => {
-      if (result && result.getDataValue("friend")) {
-        res.send(result.getDataValue("friend"));
-      } else {
-        res.send("");
-      }
-    })
-    .catch((error) => {
-      console.log(error);
+      logger.error("Fetching by Id error");
     });
 };
 
 exports.getFriendsByUserId = (req, res, next) => {
-  let userId;
-  if (req.query.userId) {
-    userId = req.query.userId;
-  } else {
-    const authToken = req.headers.authorization;
-    userId = Helper.getUserIdWithToken(authToken);
-  }
+  const authToken = req.headers.authorization;
+  const userId = getUserIdWithToken(authToken);
 
-  User.findOne({
-    where: {
-      id: userId,
-    },
-    attributes: {
-      exclude: ["password"],
-    },
-    include: {
-      model: User,
-      as: "friend",
-      attributes: {
-        exclude: ["password", "friend"],
-      },
-      through: {
-        attributes: [],
-      },
-    },
-  })
-    .then((userWithFriends) => {
-      const friends = userWithFriends.getDataValue("friend");
+  User.getFriends(userId)
+    .then((friends) => {
       res.send(friends);
+      logger.info("Fetching friends success");
     })
     .catch((error) => {
       console.log(error);
+      logger.error("Fetching friends error");
     });
 };
 
 exports.changeProfilPicture = (req, res, next) => {
   const authToken = req.headers.authorization;
-  const userId = Helper.getUserIdWithToken(authToken);
-  console.log(req.file);
-  User.update(
-    {
-      imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
-    },
-    {
-      where: {
-        id: userId,
-      },
-    }
-  )
-    .then((updatedUser) => {
+  const userId = getUserIdWithToken(authToken);
+  const imageUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
+
+  User.updateProfilPicture(userId, imageUrl)
+    .then(() => {
       res.send("update effectue");
+      logger.info("picture profil update success");
     })
     .catch((error) => {
-      console.log(error);
+      logger.error(error);
+      logger.error("error during profilPicture update");
     });
 };

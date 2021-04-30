@@ -18,19 +18,32 @@
   },
   "homepage": "https://github.com/Lucas-thullier/Groupomania-OCR-projet-7-backend#readme",
   "dependencies": {
+    "@types/module-alias": "^2.0.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "module-alias": "^2.2.2",
     "multer": "^1.4.2",
     "mysql2": "^2.2.5",
     "path": "^0.12.7",
-    "sequelize": "^6.5.0",
+    "sequelize": "^6.6.2",
     "snoowrap": "^1.22.0",
-    "validator": "^13.6.0"
+    "validator": "^13.6.0",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "sequelize-cli": "^6.2.0"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@models": "./models",
+    "@middlewares": "./middlewares",
+    "@controllers": "./controllers",
+    "@routes": "./routes",
+    "@libs": "./libs",
+    "@images": "./images",
+    "@config": "./config"
   }
 }

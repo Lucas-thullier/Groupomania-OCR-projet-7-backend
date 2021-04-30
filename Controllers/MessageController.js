@@ -1,42 +1,34 @@
-const Conversation = require("../models/Conversation");
-const Message = require("../models/Message");
-const User = require("../models/User");
-const Helper = require(`${process.cwd()}/libs/Helper`);
+const { Message } = require("@models/index");
+const { getUserIdWithToken } = require("@libs/Helper");
 
-exports.postMessage = (req, res, next) => {
-  const messageContent = req.body.messageContent;
-  const convId = req.body.convId;
-  const authToken = req.headers.authorization;
-  const userId = Helper.getUserIdWithToken(authToken);
-  Message.create({
-    text_content: messageContent,
-    user_id: userId,
-    conversation_id: convId,
-  })
-    .then((test) => {
-      console.log(test);
-      res.status(201).json({ message: "true" });
+exports.getAllByConversationId = (req, res, next) => {
+  const conversationId = req.query.convId;
+
+  Message.getAllFor(conversationId)
+    .then((messages) => {
+      res.send(messages);
+      logger.info("Fetching messages for conversation id success");
     })
-    .catch((error) => res.status(400).json({ error }));
+    .catch((error) => {
+      logger.error(error);
+      logger.error("error during fetching messages by conversation id");
+    });
 };
 
-exports.getMessagesByConvId = (req, res, next) => {
-  const convId = req.query.convId;
-  Conversation.findOne({
-    where: {
-      id: convId,
-    },
-    include: {
-      model: Message,
-      include: {
-        model: User,
-        attributes: {
-          exclude: ["password"],
-        },
-      },
-    },
-  }).then((conversation) => {
-    const allMessages = conversation.getDataValue("Messages");
-    res.send(allMessages);
-  });
+exports.new = (req, res, next) => {
+  const authToken = req.headers.authorization;
+  const userId = getUserIdWithToken(authToken);
+  const conversationId = req.body.convId;
+  const messageContent = req.body.messageContent;
+
+  Message.new(userId, conversationId, messageContent)
+    .then(() => {
+      res.status(201).json({ message: "creation success" });
+      logger.info("new message creation success");
+    })
+    .catch((error) => {
+      res.status(400).json({ error });
+      logger.error(error);
+      logger.error("new message creation failed");
+    });
 };

@@ -1,13 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middlewares/auth");
-const RedditController = require("../controllers/RedditController");
+const auth = require("@middlewares/auth");
+const RedditController = require("@controllers/RedditController");
 
-router.get("/getHotSubreddits", RedditController.getHotSubreddits);
-router.get("/getCommentsById", RedditController.getCommentsById);
+router.get("/hot-submissions", RedditController.getHotSubmissions);
+router.get("/popular-subreddits", RedditController.getPopularSubreddits);
+router.get("/comment/id", RedditController.getCommentsById);
+router.get("/subreddit", RedditController.getSubreddit);
 router.get("/authorize_callback", RedditController.authorize_callback);
-router.get("/getPopularSubreddits", RedditController.getPopularSubreddits);
-router.get("/getSubreddit", RedditController.getSubreddit);
-router.post("/createRedditComment", RedditController.createRedditComment);
 
 module.exports = router;

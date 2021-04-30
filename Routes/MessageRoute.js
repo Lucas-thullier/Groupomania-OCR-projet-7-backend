@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middlewares/auth");
-const MessageController = require("../controllers/MessageController");
+const auth = require("@middlewares/auth");
+const MessageController = require("@controllers/MessageController");
 
-router.post("/newMessage", auth, MessageController.postMessage);
-router.get("/getMessagesByConvId", auth, MessageController.getMessagesByConvId);
+router.post("/create", auth, MessageController.new);
+router.get("/conversationId", auth, MessageController.getAllByConversationId);
 
 module.exports = router;

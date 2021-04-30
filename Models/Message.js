@@ -1,19 +1,57 @@
 "use strict";
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class Message extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
+      this.belongsTo(models.User, { foreignKey: "userId" });
+      this.belongsTo(models.Conversation, { foreignKey: "conversationId" });
+    }
+
+    static async getAllFor(conversationId) {
+      try {
+        const messages = await this.findAll({
+          where: {
+            conversationId: conversationId,
+          },
+          include: {
+            model: sequelize.models.User,
+            attributes: {
+              exclude: ["password"],
+            },
+          },
+        });
+        return messages;
+      } catch (error) {
+        logger.error(error);
+        logger.error("error during fetching messages by conversation id");
+      }
+    }
+
+    static async new(userId, conversationId, messageContent) {
+      try {
+        await this.create({
+          textContent: messageContent,
+          userId: userId,
+          conversationId: conversationId,
+        });
+
+        return true;
+      } catch (error) {
+        logger.error(error);
+        logger.error("error during new message creation");
+      }
     }
   }
+
   Message.init(
     {
-      id: DataTypes.INTEGER,
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
       textContent: DataTypes.STRING,
       userId: DataTypes.INTEGER,
       conversationId: DataTypes.INTEGER,
