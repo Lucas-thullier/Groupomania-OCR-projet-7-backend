@@ -5,68 +5,70 @@ const validator = require("validator");
 const { getUserIdWithToken } = require("@libs/Helper");
 
 exports.signup = (req, res, next) => {
-  if (!validator.isStrongPassword(req.body.password)) {
-    throw (
-      "Le mot de passe doit contenir: une lettre minuscule, une lettre majuscule, un chiffre, " +
-      "un caractère spécial et doit faire plus de 8 caractères."
-    );
+  const username = req.body.username;
+  const password = req.body.password;
+  const email = req.body.email;
+
+  if (!validator.isStrongPassword(password)) {
+    return res.status(401).send("test!");
   }
 
-  if (!validator.isEmail(req.body.email)) {
-    throw "L'adresse mail renseignée n'est pas valide.";
+  if (!validator.isEmail(email)) {
+    return res.status(401).send("test");
   }
 
   bcrypt
-    .hash(req.body.password, 10)
+    .hash(password, 10)
     .then((hash) => {
-      const username = req.body.username;
-      const email = req.body.email;
       User.new(username, email, hash)
         .then(() => {
-          res.status(201).json({ message: "Utilisateur créé !" });
           logger.info("User created !");
+          return res.status(201).json({ message: "Utilisateur créé !" });
         })
         .catch((error) => {
-          res.status(400).json({ error });
           logger.error("User creation failed !");
+          return res.status(401).json({ error });
         });
     })
     .catch((error) => {
-      res.status(500).json({ error });
       logger.error("password encryption failed");
+      return res.status(401).json({ error });
     });
 };
 
 exports.login = (req, res, next) => {
   const userEmail = req.body.email;
   const passwordFromRequest = req.body.password;
+
   User.findByMail(userEmail)
     .then((user) => {
       if (!user) {
         return res.statut(401).json({ error: "Utilisateur non trouvé !" });
       }
+
       bcrypt
         .compare(passwordFromRequest, user.password)
         .then((valid) => {
           if (!valid) {
             return res.statut(401).json({ error: "Mot de passe incorrect !" });
           }
-          res.status(200).json({
+
+          logger.info("Connexion success");
+          return res.status(200).json({
             userId: user.id,
             token: jsonWebToken.sign({ userId: user.id }, "RANDOM_TOKEN_SECRET", {
               expiresIn: "24h",
             }),
           });
-          logger.info("Connexion success");
         })
         .catch((error) => {
-          res.status(500).json({ error });
           logger.error("Comparing password failed");
+          return res.status(401).json({ error });
         });
     })
     .catch((error) => {
-      res.status(500).json({ error });
       logger.error("Getting user from database failed");
+      return res.status(401).json({ error });
     });
 };
 
@@ -75,12 +77,12 @@ exports.searchUser = (req, res, next) => {
 
   User.searchByUsername(searchContent)
     .then((userLikeSearch) => {
-      res.send(userLikeSearch);
       logger.info("Sending Users fetched");
+      return res.send(userLikeSearch);
     })
     .catch((error) => {
-      console.log(error);
-      logger.error("Error during search by user");
+      logger.error(error);
+      return logger.error("Error during search by user");
     });
 };
 
