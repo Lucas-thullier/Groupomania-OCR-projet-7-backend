@@ -87,7 +87,7 @@ exports.searchUser = (req, res, next) => {
 };
 
 exports.userById = (req, res, next) => {
-  const userId = req.query.userId;
+  const userId = req.params.id;
 
   User.getById(userId)
     .then((singleUser) => {

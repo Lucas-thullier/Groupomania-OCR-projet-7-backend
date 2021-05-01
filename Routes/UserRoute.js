@@ -8,7 +8,7 @@ router.post("/signup", userController.signup);
 router.post("/login", userController.login);
 
 router.get("/search", userController.searchUser);
-router.get("/id", userController.userById);
+router.get("/:id(\\d+)", userController.userById);
 router.get("/id/friends", userController.getFriendsByUserId);
 
 router.post("/profil-picture/change", multer, userController.changeProfilPicture);
