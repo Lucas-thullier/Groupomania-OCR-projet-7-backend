@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.FeedPostComment, { foreignKey: "feedpostId" });
     }
 
-    static async getByUserId(userId) {
+    static async getByUserId(userId, offset = null) {
       try {
         const feedpost = await this.findAll({
           where: {
@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
               exclude: ["password"],
             },
           },
+          limit: 5,
+          offset: offset,
           order: [["createdAt", "DESC"]],
         });
 
@@ -34,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       try {
         await this.create({
           user_id: userId,
-          text_content: textContent,
+          textContent: textContent,
           image_url: imageUrl,
         });
 

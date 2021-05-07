@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.User, { foreignKey: "userId" });
     }
 
-    static async getByPostId(postId) {
+    static async getByPostId(postId, offset = null) {
       try {
         const comments = await this.findAll({
           where: {
@@ -18,10 +18,29 @@ module.exports = (sequelize, DataTypes) => {
             model: sequelize.models.User,
             attributes: ["username", "imageUrl", "id"],
           },
+          limit: 5,
+          offset: offset,
           order: [["createdAt", "ASC"]],
         });
 
         return comments;
+      } catch (error) {
+        logger.error(error);
+        logger.error("error during fetching post comments");
+      }
+    }
+
+    static async getCountForPostId(postId) {
+      try {
+        const count = await this.count({
+          where: {
+            feedpostId: postId,
+          },
+        });
+        console.log("cc");
+        console.log(count);
+
+        return count;
       } catch (error) {
         logger.error(error);
         logger.error("error during fetching post comments");
@@ -45,6 +64,7 @@ module.exports = (sequelize, DataTypes) => {
 
     static async deleteOne(commentId) {
       try {
+        console.log(commentId);
         await this.destroy({
           where: {
             id: commentId,

@@ -5,6 +5,6 @@ const FeedPostCommentController = require("@controllers/FeedPostCommentControlle
 
 router.get("/all", FeedPostCommentController.getByPostId);
 router.post("/new", FeedPostCommentController.new);
-// router.delete("/delete", FeedPostCommentController.delete);
+router.delete("/delete", FeedPostCommentController.delete);
 
 module.exports = router;

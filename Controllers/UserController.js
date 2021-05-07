@@ -91,10 +91,11 @@ exports.userById = (req, res, next) => {
 
   User.getById(userId)
     .then((singleUser) => {
-      res.send(singleUser);
       logger.info("Fetching by Id success");
+      return res.send(singleUser);
     })
     .catch((error) => {
+      logger.error(error);
       logger.error("Fetching by Id error");
     });
 };

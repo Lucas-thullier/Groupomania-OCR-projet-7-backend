@@ -4,8 +4,9 @@ const { getUserIdWithToken } = require("@libs/Helper");
 exports.getFeedPost = (req, res, next) => {
   const authToken = req.headers.authorization;
   const userId = getUserIdWithToken(authToken);
+  const offset = req.query.offset == 0 ? null : parseInt(req.query.offset);
 
-  FeedPost.getByUserId(userId)
+  FeedPost.getByUserId(userId, offset)
     .then((feedPost) => {
       res.send(feedPost);
       logger.info("Fetching feedpost by userId success");

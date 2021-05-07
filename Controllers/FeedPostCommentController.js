@@ -3,22 +3,33 @@ const { getUserIdWithToken } = require("@libs/Helper");
 
 exports.getByPostId = (req, res, next) => {
   const postId = req.query.postId;
+  const offset = req.query.offset == 0 ? null : parseInt(req.query.offset);
 
-  FeedPostComment.getByPostId(postId)
-    .then((feedPost) => {
-      res.send(feedPost);
-      logger.info("Fetching feedpost by userId success");
+  FeedPostComment.getCountForPostId(postId)
+    .then((count) => {
+      FeedPostComment.getByPostId(postId, offset)
+        .then((comments) => {
+          res.send({
+            comments: comments,
+            count: { count },
+          });
+          logger.info("Fetching comments of feedpost success");
+        })
+        .catch((error) => {
+          logger.error(error);
+          logger.error("error during fetching comments of feedpost");
+        });
     })
     .catch((error) => {
       logger.error(error);
-      logger.error("error during fetching by userId");
+      logger.error("error during fetching comments count");
     });
 };
 
 exports.new = (req, res, next) => {
   const authToken = req.headers.authorization;
   const userId = getUserIdWithToken(authToken);
-  const postId = req.query.postId;
+  const postId = req.body.postId;
   const messageContent = req.body.messageContent;
 
   FeedPostComment.new(userId, postId, messageContent)
@@ -35,8 +46,9 @@ exports.new = (req, res, next) => {
 exports.delete = (req, res, next) => {
   const authToken = req.headers.authorization;
   const userId = getUserIdWithToken(authToken);
+  const commentId = req.query.commentId;
 
-  FeedPostComment.deleteOne()
+  FeedPostComment.deleteOne(commentId)
     .then(() => {
       res.send(true);
       logger.info("comment deletion success");
