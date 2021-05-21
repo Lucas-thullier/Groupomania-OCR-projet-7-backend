@@ -37,19 +37,22 @@ module.exports = (sequelize, DataTypes) => {
 
     static async allByUser(userId) {
       try {
-        const conversations = await this.findAll({
+        const userWithConversations = await sequelize.models.User.findOne({
+          where: {
+            id: userId,
+          },
           include: {
-            model: sequelize.models.User,
-            attributes: ["username"],
+            model: sequelize.models.Conversation,
             through: {
               attributes: [],
             },
-            where: {
-              id: userId,
+            include: {
+              model: sequelize.models.User,
             },
-            required: true,
           },
         });
+
+        const conversations = userWithConversations.getDataValue("Conversations");
 
         return conversations;
       } catch (error) {

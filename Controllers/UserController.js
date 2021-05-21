@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jsonWebToken = require("jsonwebtoken");
 const validator = require("validator");
 const { getUserIdWithToken } = require("@libs/Helper");
+const fs = require("fs");
 
 exports.signup = (req, res, next) => {
   const username = req.body.username;
@@ -101,8 +102,7 @@ exports.userById = (req, res, next) => {
 };
 
 exports.getFriendsByUserId = (req, res, next) => {
-  const authToken = req.headers.authorization;
-  const userId = getUserIdWithToken(authToken);
+  const userId = req.params.id;
 
   User.getFriends(userId)
     .then((friends) => {
@@ -110,7 +110,7 @@ exports.getFriendsByUserId = (req, res, next) => {
       logger.info("Fetching friends success");
     })
     .catch((error) => {
-      console.log(error);
+      logger.error(error);
       logger.error("Fetching friends error");
     });
 };
@@ -121,8 +121,28 @@ exports.changeProfilPicture = (req, res, next) => {
   const imageUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
 
   User.updateProfilPicture(userId, imageUrl)
-    .then(() => {
-      res.send("update effectue");
+    .then((oldPicturePath) => {
+      if (oldPicturePath) {
+        const pathToOldFile = oldPicturePath.replace(/.+images\//, `${process.cwd()}/images/`);
+        fs.unlinkSync(pathToOldFile);
+      }
+      res.send(imageUrl);
+      logger.info("picture profil update success");
+    })
+    .catch((error) => {
+      logger.error(error);
+      logger.error("error during profilPicture update");
+    });
+};
+
+exports.changeUsername = (req, res, next) => {
+  const authToken = req.headers.authorization;
+  const userId = getUserIdWithToken(authToken);
+  const newUsername = req.body.newUsername;
+
+  User.updateUsername(userId, newUsername)
+    .then((username) => {
+      res.send(username);
       logger.info("picture profil update success");
     })
     .catch((error) => {

@@ -53,7 +53,7 @@ module.exports = () => {
               username: singleComment.author.name,
               imageUrl: null,
             },
-            text_content: singleComment.body,
+            textContent: singleComment.body,
           });
         }
 

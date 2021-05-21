@@ -9,8 +9,9 @@ router.post("/login", userController.login);
 
 router.get("/search", userController.searchUser);
 router.get("/:id(\\d+)", userController.userById);
-router.get("/id/friends", userController.getFriendsByUserId);
+router.get("/:id(\\d+)/friends", userController.getFriendsByUserId);
 
-router.post("/profil-picture/change", multer, userController.changeProfilPicture);
+router.put("/profil-picture/change", multer, userController.changeProfilPicture);
+router.put("/username/change", multer, userController.changeUsername);
 
 module.exports = router;

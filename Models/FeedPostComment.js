@@ -37,8 +37,6 @@ module.exports = (sequelize, DataTypes) => {
             feedpostId: postId,
           },
         });
-        console.log("cc");
-        console.log(count);
 
         return count;
       } catch (error) {
@@ -64,7 +62,6 @@ module.exports = (sequelize, DataTypes) => {
 
     static async deleteOne(commentId) {
       try {
-        console.log(commentId);
         await this.destroy({
           where: {
             id: commentId,

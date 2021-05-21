@@ -6,6 +6,14 @@ exports.getByIdWithUsers = (req, res, next) => {
 
   Conversation.getByIdWithUsers(conversationId)
     .then((conversation) => {
+      conversations.map((conversation) => {
+        conversation.getDataValue("Users").map((user) => {
+          if (user.getDataValue("id") != userId) {
+            const friend = user;
+            conversation.setDataValue("friend", friend);
+          }
+        });
+      });
       res.send(conversation);
       logger.info("fetching conversation by id with users success");
     })
@@ -21,6 +29,14 @@ exports.getAllByUserId = (req, res, next) => {
 
   Conversation.allByUser(userId)
     .then((conversations) => {
+      conversations.map((conversation) => {
+        conversation.getDataValue("Users").map((user) => {
+          if (user.getDataValue("id") != userId) {
+            const friend = user;
+            conversation.setDataValue("friend", friend);
+          }
+        });
+      });
       res.send(conversations);
       logger.info("fetching conversation by id with users success");
     })

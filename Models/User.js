@@ -111,9 +111,39 @@ module.exports = (sequelize, DataTypes) => {
 
     static async updateProfilPicture(userId, imageUrl) {
       try {
+        // await this.update(
+        //   {
+        //     imageUrl: imageUrl,
+        //   },
+        //   {
+        //     where: {
+        //       id: userId,
+        //     },
+        //   }
+        // );
+        const user = await this.findOne({
+          attributes: ["imageUrl", "id"],
+          where: {
+            id: userId,
+          },
+        });
+
+        const oldImage = user.getDataValue("imageUrl");
+
+        await user.update({ imageUrl: imageUrl });
+
+        return oldImage;
+      } catch (error) {
+        logger.error(error);
+        logger.error("error during profilPicture update");
+      }
+    }
+
+    static async updateUsername(userId, newUsername) {
+      try {
         await this.update(
           {
-            imageUrl: imageUrl,
+            username: newUsername,
           },
           {
             where: {
@@ -121,6 +151,8 @@ module.exports = (sequelize, DataTypes) => {
             },
           }
         );
+
+        return newUsername;
       } catch (error) {
         logger.error(error);
         logger.error("error during profilPicture update");
