@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "pre-test": "npx sequelize db:migrate:undo:all --env 'test' && npx sequelize db:migrate --env 'test' ",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "init-project": "npx sequelize db:create groupomania && npx sequelize db:migrate && npx sequelize db:seed:all"
   },
   "repository": {
     "type": "git",

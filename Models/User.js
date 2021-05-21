@@ -111,16 +111,6 @@ module.exports = (sequelize, DataTypes) => {
 
     static async updateProfilPicture(userId, imageUrl) {
       try {
-        // await this.update(
-        //   {
-        //     imageUrl: imageUrl,
-        //   },
-        //   {
-        //     where: {
-        //       id: userId,
-        //     },
-        //   }
-        // );
         const user = await this.findOne({
           attributes: ["imageUrl", "id"],
           where: {
