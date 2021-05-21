@@ -7,6 +7,8 @@ node_modules/
 
 /config/*
 !config/.gitkeep
+!config/config-example.json
+!config/reddit-example.json
 
 /log/*
 !log/.gitkeep
