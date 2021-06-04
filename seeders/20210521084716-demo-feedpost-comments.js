@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert(
-      "feedpostcomments",
+      'feedpostcomments',
       [
         {
           userId: 3,
@@ -15,16 +15,16 @@ module.exports = {
         {
           userId: 2,
           feedpostId: 1,
-          textContent: "Vivement ce weekend quand meme!",
+          textContent: 'Vivement ce weekend quand meme!',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
       ],
       {}
-    );
+    )
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete("feedpostscomments", null, {});
+    await queryInterface.bulkDelete('feedpostscomments', null, {})
   },
-};
+}

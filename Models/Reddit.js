@@ -1,23 +1,26 @@
-"use strict";
-const fs = require("fs");
-const snoowrap = require("snoowrap");
+'use strict'
+const fs = require('fs')
+const snoowrap = require('snoowrap')
 
 module.exports = () => {
   class Reddit {
     static async connexion() {
-      const configFile = fs.readFileSync(`${process.cwd()}/config/reddit.json`, "utf-8");
-      const config = JSON.parse(configFile);
-      const redditWrapper = new snoowrap(config);
+      const configFile = fs.readFileSync(
+        `${process.cwd()}/config/reddit.json`,
+        'utf-8'
+      )
+      const config = JSON.parse(configFile)
+      const redditWrapper = new snoowrap(config)
 
-      return redditWrapper;
+      return redditWrapper
     }
 
     static async getHotSubmissions() {
       try {
-        const redditWrapper = await this.connexion();
-        const hotSubmissions = await redditWrapper.getHot();
+        const redditWrapper = await this.connexion()
+        const hotSubmissions = await redditWrapper.getHot()
 
-        let hotSubmissionsData = [];
+        let hotSubmissionsData = []
         for (const singleSubmission of hotSubmissions) {
           if (singleSubmission.over_18 == false) {
             hotSubmissionsData.push({
@@ -26,27 +29,30 @@ module.exports = () => {
               submissionId: singleSubmission.name,
               thumbnail: singleSubmission.thumbnail,
               commentsCount: singleSubmission.num_comments,
-              url: "https://reddit.com" + singleSubmission.permalink,
+              url: 'https://reddit.com' + singleSubmission.permalink,
               preview: singleSubmission.preview,
-              subredditNamePrefixed: singleSubmission.subreddit_name_prefixed,
+              subredditNamePrefixed:
+                singleSubmission.subreddit_name_prefixed,
               textContent: singleSubmission.selftext,
-            });
+            })
           }
         }
 
-        return hotSubmissionsData;
+        return hotSubmissionsData
       } catch (error) {
-        logger.error(error);
-        logger.error("error during fetching hot submissions");
+        logger.error(error)
+        logger.error('error during fetching hot submissions')
       }
     }
 
     static async getCommentsById(submissionId) {
       try {
-        const redditWrapper = await this.connexion();
-        const submission = await redditWrapper.getSubmission(submissionId).expandReplies({ limit: 1, depth: 0 });
+        const redditWrapper = await this.connexion()
+        const submission = await redditWrapper
+          .getSubmission(submissionId)
+          .expandReplies({ limit: 1, depth: 0 })
 
-        let comments = [];
+        let comments = []
         for (const singleComment of submission.comments) {
           comments.push({
             User: {
@@ -54,43 +60,44 @@ module.exports = () => {
               imageUrl: null,
             },
             textContent: singleComment.body,
-          });
+          })
         }
 
-        return comments;
+        return comments
       } catch (error) {
-        logger.error(error);
-        logger.error("error during fetching comments by Id");
+        logger.error(error)
+        logger.error('error during fetching comments by Id')
       }
     }
 
     static async getPopularSubreddits() {
       try {
-        const redditWrapper = await this.connexion();
-        const popularSubreddits = await redditWrapper.getPopularSubreddits();
-        const dataToSend = [];
+        const redditWrapper = await this.connexion()
+        const popularSubreddits =
+          await redditWrapper.getPopularSubreddits()
+        const dataToSend = []
         popularSubreddits.forEach((singleSubreddit) => {
           if (singleSubreddit.over18 == false) {
             dataToSend.push({
               displayName: singleSubreddit.display_name,
               displayNamePrefixed: singleSubreddit.display_name_prefixed,
-            });
+            })
           }
-        });
+        })
 
-        return dataToSend;
+        return dataToSend
       } catch (error) {
-        logger.error(error);
-        logger.error("error during fetching popular subreddits");
+        logger.error(error)
+        logger.error('error during fetching popular subreddits')
       }
     }
 
     static async getSubreddit(subredditId) {
       try {
-        const redditWrapper = await this.connexion();
-        const subredditContent = await redditWrapper.getTop(subredditId);
+        const redditWrapper = await this.connexion()
+        const subredditContent = await redditWrapper.getTop(subredditId)
 
-        const subredditData = [];
+        const subredditData = []
         subredditContent.forEach((singleSubmission) => {
           subredditData.push({
             title: singleSubmission.title,
@@ -98,20 +105,21 @@ module.exports = () => {
             submissionId: singleSubmission.name,
             thumbnail: singleSubmission.thumbnail,
             commentsCount: singleSubmission.num_comments,
-            url: "https://reddit.com" + singleSubmission.permalink,
+            url: 'https://reddit.com' + singleSubmission.permalink,
             preview: singleSubmission.preview,
-            subredditNamePrefixed: singleSubmission.subreddit_name_prefixed,
+            subredditNamePrefixed:
+              singleSubmission.subreddit_name_prefixed,
             textContent: singleSubmission.selftext,
-          });
-        });
+          })
+        })
 
-        return subredditData;
+        return subredditData
       } catch (error) {
-        logger.error(error);
-        logger.error("error during fetching subreddit");
+        logger.error(error)
+        logger.error('error during fetching subreddit')
       }
     }
   }
 
-  return Reddit;
-};
+  return Reddit
+}

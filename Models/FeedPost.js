@@ -1,34 +1,32 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict'
+const { Model } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
   class FeedPost extends Model {
     static associate(models) {
-      this.belongsTo(models.User, { foreignKey: "user_id" });
-      this.hasMany(models.FeedPostComment, { foreignKey: "feedpostId" });
+      this.belongsTo(models.User, { foreignKey: 'user_id' })
+      this.hasMany(models.FeedPostComment, { foreignKey: 'feedpostId' })
     }
 
     static async getByUserId(userId, offset = null) {
+      // devenu getAll
       try {
         const feedpost = await this.findAll({
-          where: {
-            user_id: userId,
-          },
           include: {
             model: sequelize.models.User,
             attributes: {
-              exclude: ["password"],
+              exclude: ['password'],
             },
           },
           limit: 5,
           offset: offset,
-          order: [["createdAt", "DESC"]],
-        });
+          order: [['createdAt', 'DESC']],
+        })
 
-        return feedpost;
+        return feedpost
       } catch (error) {
-        logger.error(error);
-        logger.error("error during fetching feedpost by userId");
+        logger.error(error)
+        logger.error('error during fetching feedpost by userId')
       }
     }
 
@@ -38,12 +36,12 @@ module.exports = (sequelize, DataTypes) => {
           user_id: userId,
           textContent: textContent,
           image_url: imageUrl,
-        });
+        })
 
-        return true;
+        return true
       } catch (error) {
-        logger.error(error);
-        logger.error("error during feedpost creation");
+        logger.error(error)
+        logger.error('error during feedpost creation')
       }
     }
 
@@ -53,10 +51,10 @@ module.exports = (sequelize, DataTypes) => {
           where: {
             id: feedPostId,
           },
-        });
+        })
       } catch (error) {
-        logger.error(error);
-        logger.error("error during feedpost deletion");
+        logger.error(error)
+        logger.error('error during feedpost deletion')
       }
     }
   }
@@ -74,8 +72,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "FeedPost",
+      modelName: 'FeedPost',
     }
-  );
-  return FeedPost;
-};
+  )
+  return FeedPost
+}

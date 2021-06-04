@@ -26,10 +26,10 @@ module.exports = {
   // coverageDirectory: undefined,
 
   // An array of regexp pattern strings used to skip coverage collection
-  coveragePathIgnorePatterns: ["\\\\node_modules\\\\"],
+  coveragePathIgnorePatterns: ['\\\\node_modules\\\\'],
 
   // Indicates which provider should be used to instrument code for coverage
-  coverageProvider: "v8",
+  coverageProvider: 'v8',
 
   // A list of reporter names that Jest uses when writing coverage reports
   // coverageReporters: [
@@ -80,13 +80,13 @@ module.exports = {
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
-    "@models/(.*)": "<rootDir>/models/$1",
-    "@middlewares/(.*)": "<rootDir>/middlewares/$1",
-    "@controllers/(.*)": "<rootDir>/controllers/$1",
-    "@routes/(.*)": "<rootDir>/routes/$1",
-    "@libs/(.*)": "<rootDir>/libs/$1",
-    "@images/(.*)": "<rootDir>/images/$1",
-    "@config/(.*)": "<rootDir>/config/$1",
+    '@models/(.*)': '<rootDir>/models/$1',
+    '@middlewares/(.*)': '<rootDir>/middlewares/$1',
+    '@controllers/(.*)': '<rootDir>/controllers/$1',
+    '@routes/(.*)': '<rootDir>/routes/$1',
+    '@libs/(.*)': '<rootDir>/libs/$1',
+    '@images/(.*)': '<rootDir>/images/$1',
+    '@config/(.*)': '<rootDir>/config/$1',
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
@@ -120,7 +120,7 @@ module.exports = {
   // restoreMocks: false,
 
   // The root directory that Jest should scan for tests and modules within
-  rootDir: ".",
+  rootDir: '.',
 
   // A list of paths to directories that Jest should use to search for files in
   // roots: [
@@ -143,7 +143,7 @@ module.exports = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: "node",
+  testEnvironment: 'node',
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -197,4 +197,4 @@ module.exports = {
 
   // Whether to use watchman for file crawling
   // watchman: true,
-};
+}

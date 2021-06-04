@@ -1,5 +1,5 @@
-"use strict";
-const { Model, Op } = require("sequelize");
+'use strict'
+const { Model, Op } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
   class Friend extends Model {
@@ -11,18 +11,18 @@ module.exports = (sequelize, DataTypes) => {
           userA: userId,
           userB: friendId,
           isPending: 0,
-        });
+        })
 
         await this.create({
           userA: friendId,
           userB: userId,
           isPending: 1,
-        });
+        })
 
-        return true;
+        return true
       } catch (error) {}
-      logger.error(error);
-      logger.error("Friendship creation failed");
+      logger.error(error)
+      logger.error('Friendship creation failed')
     }
 
     static async delete(userId, friendId) {
@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
               userB: friendId,
             },
           },
-        });
+        })
 
         await this.destroy({
           where: {
@@ -43,12 +43,12 @@ module.exports = (sequelize, DataTypes) => {
               userB: userId,
             },
           },
-        });
+        })
 
-        return true;
+        return true
       } catch (error) {
-        logger.error(error);
-        logger.error("error during friendship deletion");
+        logger.error(error)
+        logger.error('error during friendship deletion')
       }
     }
   }
@@ -61,8 +61,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Friend",
+      modelName: 'Friend',
     }
-  );
-  return Friend;
-};
+  )
+  return Friend
+}

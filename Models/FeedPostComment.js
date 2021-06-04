@@ -1,11 +1,11 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict'
+const { Model } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
   class FeedPostComment extends Model {
     static associate(models) {
-      this.belongsTo(models.FeedPost, { foreignKey: "feedpostId" });
-      this.belongsTo(models.User, { foreignKey: "userId" });
+      this.belongsTo(models.FeedPost, { foreignKey: 'feedpostId' })
+      this.belongsTo(models.User, { foreignKey: 'userId' })
     }
 
     static async getByPostId(postId, offset = null) {
@@ -16,17 +16,17 @@ module.exports = (sequelize, DataTypes) => {
           },
           include: {
             model: sequelize.models.User,
-            attributes: ["username", "imageUrl", "id"],
+            attributes: ['username', 'imageUrl', 'id'],
           },
           limit: 5,
           offset: offset,
-          order: [["createdAt", "ASC"]],
-        });
+          order: [['createdAt', 'ASC']],
+        })
 
-        return comments;
+        return comments
       } catch (error) {
-        logger.error(error);
-        logger.error("error during fetching post comments");
+        logger.error(error)
+        logger.error('error during fetching post comments')
       }
     }
 
@@ -36,12 +36,12 @@ module.exports = (sequelize, DataTypes) => {
           where: {
             feedpostId: postId,
           },
-        });
+        })
 
-        return count;
+        return count
       } catch (error) {
-        logger.error(error);
-        logger.error("error during fetching post comments");
+        logger.error(error)
+        logger.error('error during fetching post comments')
       }
     }
 
@@ -51,12 +51,12 @@ module.exports = (sequelize, DataTypes) => {
           feedpostId: postId,
           textContent: messageContent,
           userId: userId,
-        });
+        })
 
-        return true;
+        return true
       } catch (error) {
-        logger.error(error);
-        logger.error("error during new comment creation");
+        logger.error(error)
+        logger.error('error during new comment creation')
       }
     }
 
@@ -66,12 +66,12 @@ module.exports = (sequelize, DataTypes) => {
           where: {
             id: commentId,
           },
-        });
+        })
 
-        return true;
+        return true
       } catch (error) {
-        logger.error(error);
-        logger.error("error during comment deletion");
+        logger.error(error)
+        logger.error('error during comment deletion')
       }
     }
   }
@@ -91,9 +91,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "FeedPostComment",
+      modelName: 'FeedPostComment',
     }
-  );
+  )
 
-  return FeedPostComment;
-};
+  return FeedPostComment
+}

@@ -1,17 +1,17 @@
-"use strict";
+'use strict'
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    queryInterface.addConstraint("friends", {
-      type: "FOREIGN KEY",
-      fields: ["userB"],
+    queryInterface.addConstraint('friends', {
+      type: 'FOREIGN KEY',
+      fields: ['userB'],
       references: {
-        table: "users",
-        field: "id",
+        table: 'users',
+        field: 'id',
       },
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    });
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    })
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -22,4 +22,4 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
   },
-};
+}

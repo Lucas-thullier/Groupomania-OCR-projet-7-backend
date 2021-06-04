@@ -1,16 +1,9 @@
-const express = require("express");
-const router = express.Router();
-const auth = require("@middlewares/auth");
-const multer = require("@middlewares/multer-config");
-const ConversationController = require("@controllers/ConversationController");
+const express = require('express')
+const router = express.Router()
+const auth = require('@middlewares/auth')
+const ConversationController = require('@controllers/ConversationController')
 
-router.get("/id", auth, ConversationController.getByIdWithUsers);
-router.get("/all/userId", auth, ConversationController.getAllByUserId);
-// router.get("/getConversationByUserAndFriendId", ConversationController.getConversationByUserAndFriendId);
-// router.post("/createConversation", auth, ConversationController.createConversation);
-// router.post("/changeConversationPicture", auth, multer, ConversationController.changeConversationPicture);
-// router.put("/leaveConversation", auth, ConversationController.leaveConversation);
-// router.post("/addUserToConversation", ConversationController.addUserToConversation);
+router.get('/id', auth, ConversationController.getByIdWithUsers)
+router.get('/all/userId', auth, ConversationController.getAllByUserId)
 
-// router.get("/byUserAndFriend", ConversationController.getConversationByUserAndFriendId);
-module.exports = router;
+module.exports = router

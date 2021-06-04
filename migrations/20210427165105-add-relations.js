@@ -1,90 +1,90 @@
-"use strict";
+'use strict'
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface
-      .addConstraint("messages", {
-        type: "FOREIGN KEY",
-        fields: ["userId"],
+      .addConstraint('messages', {
+        type: 'FOREIGN KEY',
+        fields: ['userId'],
         references: {
-          table: "users",
-          field: "id",
+          table: 'users',
+          field: 'id',
         },
-        onDelete: "cascade",
-        onUpdate: "cascade",
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
       })
       .then(() => {
-        queryInterface.addConstraint("messages", {
-          type: "FOREIGN KEY",
-          fields: ["conversationId"],
+        queryInterface.addConstraint('messages', {
+          type: 'FOREIGN KEY',
+          fields: ['conversationId'],
           references: {
-            table: "conversations",
-            field: "id",
+            table: 'conversations',
+            field: 'id',
           },
-          onDelete: "cascade",
-          onUpdate: "cascade",
-        });
+          onDelete: 'cascade',
+          onUpdate: 'cascade',
+        })
       })
       .then(() => {
-        queryInterface.addConstraint("feedposts", {
-          type: "FOREIGN KEY",
-          fields: ["user_id"],
+        queryInterface.addConstraint('feedposts', {
+          type: 'FOREIGN KEY',
+          fields: ['user_id'],
           references: {
-            table: "users",
-            field: "id",
+            table: 'users',
+            field: 'id',
           },
-          onDelete: "cascade",
-          onUpdate: "cascade",
-        });
+          onDelete: 'cascade',
+          onUpdate: 'cascade',
+        })
       })
       .then(() => {
-        queryInterface.addConstraint("feedpostcomments", {
-          type: "FOREIGN KEY",
-          fields: ["userId"],
+        queryInterface.addConstraint('feedpostcomments', {
+          type: 'FOREIGN KEY',
+          fields: ['userId'],
           references: {
-            table: "users",
-            field: "id",
+            table: 'users',
+            field: 'id',
           },
-          onDelete: "cascade",
-          onUpdate: "cascade",
-        });
+          onDelete: 'cascade',
+          onUpdate: 'cascade',
+        })
       })
       .then(() => {
-        queryInterface.addConstraint("feedpostcomments", {
-          type: "FOREIGN KEY",
-          fields: ["feedpostId"],
+        queryInterface.addConstraint('feedpostcomments', {
+          type: 'FOREIGN KEY',
+          fields: ['feedpostId'],
           references: {
-            table: "feedposts",
-            field: "id",
+            table: 'feedposts',
+            field: 'id',
           },
-          onDelete: "cascade",
-          onUpdate: "cascade",
-        });
+          onDelete: 'cascade',
+          onUpdate: 'cascade',
+        })
       })
       .then(() => {
-        queryInterface.addConstraint("users_conversations", {
-          type: "FOREIGN KEY",
-          fields: ["userId"],
+        queryInterface.addConstraint('users_conversations', {
+          type: 'FOREIGN KEY',
+          fields: ['userId'],
           references: {
-            table: "users",
-            field: "id",
+            table: 'users',
+            field: 'id',
           },
-          onDelete: "cascade",
-          onUpdate: "cascade",
-        });
+          onDelete: 'cascade',
+          onUpdate: 'cascade',
+        })
       })
       .then(() => {
-        queryInterface.addConstraint("users_conversations", {
-          type: "FOREIGN KEY",
-          fields: ["conversationId"],
+        queryInterface.addConstraint('users_conversations', {
+          type: 'FOREIGN KEY',
+          fields: ['conversationId'],
           references: {
-            table: "conversations",
-            field: "id",
+            table: 'conversations',
+            field: 'id',
           },
-          onDelete: "cascade",
-          onUpdate: "cascade",
-        });
-      });
+          onDelete: 'cascade',
+          onUpdate: 'cascade',
+        })
+      })
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -95,4 +95,4 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
   },
-};
+}

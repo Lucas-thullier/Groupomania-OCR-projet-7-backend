@@ -1,11 +1,11 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict'
+const { Model } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
   class Message extends Model {
     static associate(models) {
-      this.belongsTo(models.User, { foreignKey: "userId" });
-      this.belongsTo(models.Conversation, { foreignKey: "conversationId" });
+      this.belongsTo(models.User, { foreignKey: 'userId' })
+      this.belongsTo(models.Conversation, { foreignKey: 'conversationId' })
     }
 
     static async getAllFor(conversationId) {
@@ -17,14 +17,14 @@ module.exports = (sequelize, DataTypes) => {
           include: {
             model: sequelize.models.User,
             attributes: {
-              exclude: ["password"],
+              exclude: ['password'],
             },
           },
-        });
-        return messages;
+        })
+        return messages
       } catch (error) {
-        logger.error(error);
-        logger.error("error during fetching messages by conversation id");
+        logger.error(error)
+        logger.error('error during fetching messages by conversation id')
       }
     }
 
@@ -34,12 +34,12 @@ module.exports = (sequelize, DataTypes) => {
           textContent: messageContent,
           userId: userId,
           conversationId: conversationId,
-        });
+        })
 
-        return true;
+        return true
       } catch (error) {
-        logger.error(error);
-        logger.error("error during new message creation");
+        logger.error(error)
+        logger.error('error during new message creation')
       }
     }
   }
@@ -58,8 +58,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Message",
+      modelName: 'Message',
     }
-  );
-  return Message;
-};
+  )
+  return Message
+}

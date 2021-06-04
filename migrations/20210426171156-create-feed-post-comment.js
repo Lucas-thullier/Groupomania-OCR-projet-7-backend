@@ -1,7 +1,7 @@
-"use strict";
+'use strict'
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("FeedPostComments", {
+    await queryInterface.createTable('FeedPostComments', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -28,9 +28,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
-    });
+    })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("FeedPostComments");
+    await queryInterface.dropTable('FeedPostComments')
   },
-};
+}
