@@ -2,11 +2,11 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    queryInterface.addConstraint('friends', {
+    queryInterface.addConstraint('Friends', {
       type: 'FOREIGN KEY',
       fields: ['userA'],
       references: {
-        table: 'users',
+        table: 'Users',
         field: 'id',
       },
       onDelete: 'cascade',

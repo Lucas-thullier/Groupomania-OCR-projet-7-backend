@@ -3,22 +3,22 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface
-      .addConstraint('messages', {
+      .addConstraint('Messages', {
         type: 'FOREIGN KEY',
         fields: ['userId'],
         references: {
-          table: 'users',
+          table: 'Users',
           field: 'id',
         },
         onDelete: 'cascade',
         onUpdate: 'cascade',
       })
       .then(() => {
-        queryInterface.addConstraint('messages', {
+        queryInterface.addConstraint('Messages', {
           type: 'FOREIGN KEY',
           fields: ['conversationId'],
           references: {
-            table: 'conversations',
+            table: 'Conversations',
             field: 'id',
           },
           onDelete: 'cascade',
@@ -26,11 +26,11 @@ module.exports = {
         })
       })
       .then(() => {
-        queryInterface.addConstraint('feedposts', {
+        queryInterface.addConstraint('FeedPosts', {
           type: 'FOREIGN KEY',
           fields: ['user_id'],
           references: {
-            table: 'users',
+            table: 'Users',
             field: 'id',
           },
           onDelete: 'cascade',
@@ -38,11 +38,11 @@ module.exports = {
         })
       })
       .then(() => {
-        queryInterface.addConstraint('feedpostcomments', {
+        queryInterface.addConstraint('FeedPostComments', {
           type: 'FOREIGN KEY',
           fields: ['userId'],
           references: {
-            table: 'users',
+            table: 'Users',
             field: 'id',
           },
           onDelete: 'cascade',
@@ -50,11 +50,11 @@ module.exports = {
         })
       })
       .then(() => {
-        queryInterface.addConstraint('feedpostcomments', {
+        queryInterface.addConstraint('FeedPostComments', {
           type: 'FOREIGN KEY',
           fields: ['feedpostId'],
           references: {
-            table: 'feedposts',
+            table: 'FeedPosts',
             field: 'id',
           },
           onDelete: 'cascade',
@@ -62,11 +62,11 @@ module.exports = {
         })
       })
       .then(() => {
-        queryInterface.addConstraint('users_conversations', {
+        queryInterface.addConstraint('Users_Conversations', {
           type: 'FOREIGN KEY',
           fields: ['userId'],
           references: {
-            table: 'users',
+            table: 'Users',
             field: 'id',
           },
           onDelete: 'cascade',
@@ -74,11 +74,11 @@ module.exports = {
         })
       })
       .then(() => {
-        queryInterface.addConstraint('users_conversations', {
+        queryInterface.addConstraint('Users_Conversations', {
           type: 'FOREIGN KEY',
           fields: ['conversationId'],
           references: {
-            table: 'conversations',
+            table: 'Conversations',
             field: 'id',
           },
           onDelete: 'cascade',

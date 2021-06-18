@@ -7,7 +7,7 @@
     "test": "jest",
     "pre-test": "npx sequelize db:migrate:undo:all --env 'test' && npx sequelize db:migrate --env 'test' ",
     "start": "nodemon server.js",
-    "init-project": "npx sequelize db:create groupomania && npx sequelize db:migrate && npx sequelize db:seed:all"
+    "init-project": "npx sequelize db:migrate && npx sequelize db:seed:all"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "mariadb": "^2.5.3",
     "module-alias": "^2.2.2",
     "multer": "^1.4.2",
     "mysql2": "^2.2.5",
